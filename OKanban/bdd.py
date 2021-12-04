@@ -60,6 +60,7 @@ class BddOKanbans(object):
     def del_reference(self, proref):
         '''Delete a reference
         '''
+        #TODO : vérifier si kanbans non vides existes
         self.references.delete_one({'proref' : proref})
 
     def get_references(self, proref = None):
@@ -71,11 +72,19 @@ class BddOKanbans(object):
             filter = {}
         return list(self.references.find(filter))
     
+    def get_params(self, param=None):
+        '''Get [one] or all params
+        '''
+        if param:
+            filter = {'param' : param}
+        else:
+            filter = {}
+        return list(self.params.find(filter))
+
     def get_id(self):
         '''Get the next id
         '''
-        filter = {'param' : self.param_last_id}
-        result = list(self.params.find(filter))
+        result = self.get_params(self.param_last_id)
         if result:
             id = result[0].get('value',0) + 1
             self.params.update_many(filter, {'$set': {'value' : id}})    
@@ -117,4 +126,3 @@ class BddOKanbans(object):
                 kanban['date_creation'] = date_creation
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})
             #TODO : ajouter historique
-            
