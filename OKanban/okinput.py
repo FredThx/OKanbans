@@ -45,8 +45,8 @@ class OKInput(OKES):
         self.layout.addWidget(label_ref, 0,0)
         self.edit_reference = QLineEdit()
         self.edit_reference.setFont(self.font)
-        self.edit_reference.textChanged.connect(self.edit_reference_change)
-        self.edit_reference.returnPressed.connect(self.bt_clicked)
+        self.edit_reference.textChanged.connect(self.on_edit_reference_change)
+        self.edit_reference.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_reference,0,1)
         #Ligne 2 : Qté
         label_qty = QLabel("Quantité :")
@@ -55,19 +55,19 @@ class OKInput(OKES):
         self.edit_qty = QLineEdit()
         self.edit_qty.setFont(self.font)
         self.edit_qty.setValidator(QIntValidator())
-        self.edit_qty.returnPressed.connect(self.bt_clicked)
+        self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
         bt = QPushButton("Création")
         bt.setFont(self.font)
-        bt.clicked.connect(self.bt_clicked)
+        bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
     
-    def bt_clicked(self):
+    def on_bt_clicked(self):
         '''Création kanban selon champs complétés
         '''
         proref = self.edit_reference.text()
-        qte = self.edit_qty.text()
+        qte = int(self.edit_qty.text())
         try:
             self.bdd.set_kanban(proref=proref, qte=qte)
         except AssertionError as e:
@@ -77,7 +77,7 @@ class OKInput(OKES):
             self.edit_reference.setText("")
             self.edit_qty.setText("")
     
-    def edit_reference_change(self, text = ''):
+    def on_edit_reference_change(self, text = ''):
         '''Quand le text est modifié : 
             changement de couleur si ref ok
             initialisation de la qté
@@ -110,6 +110,9 @@ class OKOutput(OKES):
         self.layout.addWidget(label_ref, 0,0)
         self.edit_kanban = QLineEdit()
         self.edit_kanban.setFont(self.font)
+        self.edit_kanban.setValidator(QIntValidator())
+        self.edit_kanban.textChanged.connect(self.on_edit_kanban_change)
+        self.edit_kanban.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_kanban,0,1)
         #Ligne 2 : Qté
         label_qty = QLabel("Quantité à enlever:")
@@ -117,9 +120,41 @@ class OKOutput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = QLineEdit()
         self.edit_qty.setFont(self.font)
+        self.edit_qty.setValidator(QIntValidator())
+        self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
         bt = QPushButton("Ok")
         bt.setFont(self.font)
+        bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
-        #
+    
+    def on_bt_clicked(self):
+        '''Consommation du kanban
+        '''
+        id = int(self.edit_kanban.text())
+        qte_a_enlever = int(self.edit_qty.text())
+        qte_kanban = self.bdd.get_kanban(id=id)[0].get('qte')
+        try:
+            self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
+        except AssertionError as e:
+            logging.warning(e)
+            #TODO : status
+        else:
+            self.edit_kanban.setText("")
+            self.edit_qty.setText("")
+
+    def on_edit_kanban_change(self, text = ''):
+        '''Quand le text est modifié : 
+            changement de couleur si n° de kanban ok
+            initialisation de la qté
+        '''
+        if text == '':
+            style = ""
+        elif len(self.bdd.get_kanban(int(text)))==1:
+            style = "background-color: green;"
+            self.edit_qty.setText(str(self.bdd.get_kanban(id=int(text))[0].get('qte')))
+        else:
+            style = "background-color: red;"
+            self.edit_qty.setText('')
+        self.edit_kanban.setStyleSheet(style)

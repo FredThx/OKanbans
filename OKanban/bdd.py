@@ -39,6 +39,8 @@ class BddOKanbans(object):
         self.params = self.get_collection('params')
         self.cache_references = None
         self.cache_references_timeout = None
+        self.cache_kanbans = None
+        self.cache_kanbans_timeout = None
         self.cache_timeout = cache_timeout
 
     def get_collection(self, table):
@@ -82,6 +84,7 @@ class BddOKanbans(object):
 
     def get_references(self, proref = None):
         '''get the list of all references
+        (avec systeme cache)
         '''
         if not(self.cache_references and self.cache_references_timeout and self.cache_references_timeout > time.time()):
             self.cache_references = self.get_list(self.references.find())
@@ -148,8 +151,27 @@ class BddOKanbans(object):
                 assert proref in [ref.get('proref') for ref in self.get_references()], f"{proref} not present in references."
                 kanban['proref']=proref
             if qte is not None:
-                kanban['qte'] = qte
+                kanban['qte'] = int(qte)
             if date_creation:
                 kanban['date_creation'] = date_creation
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})
             #TODO : ajouter historique
+        self.cache_kanbans = None
+    
+    def get_kanban(self, id=None, all = False):
+        '''Renvoie la liste des kanbans (limité à 1 éventuellement)
+        (avec systeme cache)
+        all     :   si False ou omis : uniquement les kanbans non vides
+                    si True : tous les kanbans (pas de cache)
+        '''
+        if all:
+            return self.get_list(self.kanbans.find())
+        else:
+            filter={'qte' : {'$gt' : 0}}
+            if not(self.cache_kanbans and self.cache_kanbans_timeout and self.cache_kanbans_timeout > time.time()):
+                self.cache_kanbans = self.get_list(self.kanbans.find(filter))
+                self.cache_kanbans_timeout = time.time() + self.cache_timeout
+            if id:
+                return [k for k in self.cache_kanbans if k.get('id')==id]
+            else:
+                return self.cache_kanbans
