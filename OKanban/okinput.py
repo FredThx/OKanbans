@@ -21,7 +21,10 @@ class OKES(QWidget):
         self.font = QFont('Ubuntu', 36)
         self.layout = QGridLayout()
         #self.setStyleSheet(self.style_sheet)
+        self.layout.setVerticalSpacing(20)
+        self.layout.setHorizontalSpacing(20)
         self.setLayout(self.layout)
+
 
     def connect(self):
         '''Connecte the database'''
@@ -105,16 +108,16 @@ class OKOutput(OKES):
     def initUI(self):
         super().initUI()
         #Ligne 1 : n° Kanban
-        label_ref = QLabel("N° de kanban :")
-        label_ref.setFont(self.font)
-        self.layout.addWidget(label_ref, 0,0)
+        self.label_id = QLabel("N° de kanban :")
+        self.label_id.setFont(self.font)
+        self.layout.addWidget(self.label_id, 0,0)
         self.edit_kanban = QLineEdit()
         self.edit_kanban.setFont(self.font)
         self.edit_kanban.setValidator(QIntValidator())
         self.edit_kanban.textChanged.connect(self.on_edit_kanban_change)
         self.edit_kanban.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_kanban,0,1)
-        #Ligne 2 : Qté
+        #Ligne 3 : Qté
         label_qty = QLabel("Quantité à enlever:")
         label_qty.setFont(self.font)
         self.layout.addWidget(label_qty, 1,0)
@@ -123,12 +126,19 @@ class OKOutput(OKES):
         self.edit_qty.setValidator(QIntValidator())
         self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
-        #Ligne 3 : Boutons
+        #Ligne 4 : Boutons et proref
+        self.label_proref = QLabel()
+        self.label_proref.setFont(self.font)
+        self.label_proref.setAlignment(Qt.AlignCenter)
+        self.label_proref.setStyleSheet("color : green;")
+        self.layout.addWidget(self.label_proref,2,0)
         bt = QPushButton("Ok")
         bt.setFont(self.font)
         bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
-    
+
+
+
     def on_bt_clicked(self):
         '''Consommation du kanban
         '''
@@ -153,8 +163,11 @@ class OKOutput(OKES):
             style = ""
         elif len(self.bdd.get_kanban(int(text)))==1:
             style = "background-color: green;"
-            self.edit_qty.setText(str(self.bdd.get_kanban(id=int(text))[0].get('qte')))
+            kanban = self.bdd.get_kanban(id=int(text))[0]
+            self.edit_qty.setText(str(kanban.get('qte')))
+            self.label_proref.setText(kanban.get('proref'))
         else:
             style = "background-color: red;"
             self.edit_qty.setText('')
+            self.label_proref.setText('')
         self.edit_kanban.setStyleSheet(style)
