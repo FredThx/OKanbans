@@ -31,7 +31,7 @@ class OKanbanApp(QMainWindow):
     def initUI(self):
         '''Création des composants graphiques
         '''
-        self.setGeometry(0, 0, 1000,1200)#480, 320) #default size
+        self.setGeometry(50, 50, 800,800)#480, 320) #default size
         if self.fullscreen:
             self.showFullScreen()
         #Status barre
