@@ -2,7 +2,7 @@
 
 import logging
 
-from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox
 from PyQt5.QtGui import QFont, QIntValidator
 from PyQt5.QtCore import Qt
 
@@ -40,17 +40,31 @@ class OKInput(OKES):
         self.title = "Zone d'entrée"
         super().__init__(parent)
     
+    def connect(self):
+        super().connect()
+        self.update()
+    
+    def update(self):
+        '''Update the comboBox
+        '''
+        self.combo_ref.clear()
+        self.combo_ref.addItems([ref.get('proref') for ref in self.bdd.get_references()])
+        self.edit_reference.clear()
+
     def initUI(self):
         super().initUI()
         #Ligne 1 : Référence
         label_ref = QLabel("Référence :")
         label_ref.setFont(self.font)
         self.layout.addWidget(label_ref, 0,0)
+        self.combo_ref = QComboBox()
+        self.combo_ref.setFont(self.font)
         self.edit_reference = QLineEdit()
         self.edit_reference.setFont(self.font)
         self.edit_reference.textChanged.connect(self.on_edit_reference_change)
         self.edit_reference.returnPressed.connect(self.on_bt_clicked)
-        self.layout.addWidget(self.edit_reference,0,1)
+        self.combo_ref.setLineEdit(self.edit_reference)
+        self.layout.addWidget(self.combo_ref,0,1)
         #Ligne 2 : Qté
         label_qty = QLabel("Quantité :")
         label_qty.setFont(self.font)
