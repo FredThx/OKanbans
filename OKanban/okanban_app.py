@@ -74,9 +74,11 @@ class OKanbanApp(QMainWindow):
         ##Input
         self.input = OKInput()
         self.central_widget.addWidget(self.input)
+        self.input.connect()
         ##Output
         self.output = OKOutput()
         self.central_widget.addWidget(self.output)
+        self.input.connect()
         ##Params
         params_widget = QWidget()
         params_layout = QVBoxLayout(params_widget)

@@ -88,6 +88,15 @@ class BddOKanbans(object):
         else:
             filter = {}
         return self.get_list(self.params.find(filter))
+    
+    def set_params(self,param, value):
+        '''Save param / value on bdd
+        '''
+        filter = {'param' : param}
+        if self.get_params(param):
+            self.params.update_many(filter, {'$set': {'value' : value}})    
+        else:
+            self.params.insert_one({'param': self.param_last_id, 'value' : value})
 
     def get_id(self):
         '''Get the next id
@@ -95,10 +104,9 @@ class BddOKanbans(object):
         result = self.get_params(self.param_last_id)
         if result:
             id = result[0].get('value',0) + 1
-            self.params.update_many(filter, {'$set': {'value' : id}})    
         else:
             id = 1
-            self.params.insert_one({'param': self.param_last_id, 'value' : id})
+        self.set_params(self.param_last_id, id)
         return id
 
     def set_kanban(self, id = None, proref = None, qte = None, date_creation = None):

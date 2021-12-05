@@ -1,14 +1,20 @@
 # coding: utf-8
 
+import logging
+
 from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
+
+from .qtutils import Qutil
+import OKanban.okanban_app as OK_app #Evite circular import
 
 class OKES(QWidget):
     '''Tableau des kanbans
     '''
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.bdd = None
         self.initUI()
     
     def initUI(self):
@@ -17,7 +23,10 @@ class OKES(QWidget):
         #self.setStyleSheet(self.style_sheet)
         self.setLayout(self.layout)
 
-        
+    def connect(self):
+        '''Connecte the database'''
+        if not self.bdd:
+            self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
     
 class OKInput(OKES):
     '''Une zone de saisie d'entree en stock
@@ -45,10 +54,26 @@ class OKInput(OKES):
         self.edit_qty.setFont(self.font)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
-        bt = QPushButton("Imprimer")
+        bt = QPushButton("Création")
         bt.setFont(self.font)
+        bt.clicked.connect(self.bt_clicked)
         self.layout.addWidget(bt,2,1)
-        #
+    
+    def bt_clicked(self):
+        '''Création kanban selon champs complétés
+        '''
+        proref = self.edit_reference.text()
+        qte = self.edit_qty.text()
+        try:
+            self.bdd.set_kanban(proref=proref, qte=qte)
+        except AssertionError as e:
+            logging.warning(e)
+            #TODO : fenetre UI
+        else:
+            self.edit_reference.setText("")
+            self.edit_qty.setText("")
+        
+
 
 class OKOutput(OKES):
     '''Une zone de saisie de Sortie

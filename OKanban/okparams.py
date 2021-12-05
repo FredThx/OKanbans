@@ -24,11 +24,7 @@ class OKParams(QWidget):
     def connect(self):
         '''Connecte the database'''
         if not self.bdd:
-            try:
-                self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
-            except:
-                logging.error("ERROR!!!")
-                self.bdd = BddOKanbans('192.168.0.11')
+            self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
 
     def load(self):
         '''Load datas
