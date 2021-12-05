@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableVi
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
-from .pandas_model import PandasModel
+from .pandas_table import DFEditor
 from .bdd import BddOKanbans
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
@@ -34,11 +34,10 @@ class OKParams(QWidget):
         if not df.empty:
             df = df.drop('_id', axis=1)
         logging.debug(df)
-        model = PandasModel(df)
-        self.table.setModel(model)
+        self.table.load(df)
     
     def initUI(self):
-        self.setStyleSheet('background-color: yellow;')
+        #self.setStyleSheet('background-color: yellow;')
         self.layout = QVBoxLayout(self)
         title_layout = QHBoxLayout()
         self.label = QLabel(self.title, self, alignment = Qt.AlignLeft)
@@ -48,8 +47,9 @@ class OKParams(QWidget):
         button.clicked.connect(self.load)
         title_layout.addWidget(button)
         self.layout.addLayout(title_layout)
-        self.table = QTableView (self)
-        self.table.setSortingEnabled(True)
+        self.table = DFEditor(self)
+        self.table.setStyleSheet('font-size: 18px;')
+        #self.table.setSortingEnabled(True)
         self.layout.addWidget(self.table)
 
 class OKGenParams(OKParams):
