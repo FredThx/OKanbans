@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import pymongo, datetime
+import pymongo, datetime, logging
 from bson.decimal128 import Decimal128
 from bson.codec_options import TypeCodec
 from bson.codec_options import TypeRegistry
@@ -37,6 +37,15 @@ class BddOKanbans(object):
     def get_collection(self, table):
         return self.bdd.get_collection(table, codec_options=self.codec_options)
     
+    def get_list(self, cursor):
+        '''Execute the query and return a list of results
+        '''
+        try:
+            return list(cursor)
+        except pymongo.errors.ServerSelectionTimeoutError as e:
+            logging.warning(e)
+            return []
+
     @staticmethod
     def date_to_str(date, time = False):
         if isinstance(date, datetime.date):
@@ -44,7 +53,6 @@ class BddOKanbans(object):
             if not time:
                 date = date.split('T')[0]
         return date
-    
 
     def set_reference(self, proref, qte_kanban_plein = 100, nb_max = 0, nb_alerte = 0):
         ''' Crée ou modifie une référence
@@ -52,7 +60,7 @@ class BddOKanbans(object):
         data = locals().copy()
         filter = {'proref' : proref}
         del data['self']
-        if list(self.references.find(filter)):
+        if self.get_list(self.references.find(filter)):
             self.references.update_many(filter,{'$set' : data})
         else:
             self.references.insert_one(data)
@@ -70,7 +78,7 @@ class BddOKanbans(object):
             filter = {'proref' : proref}
         else:
             filter = {}
-        return list(self.references.find(filter))
+        return self.get_list(self.references.find(filter))
     
     def get_params(self, param=None):
         '''Get [one] or all params
@@ -79,7 +87,7 @@ class BddOKanbans(object):
             filter = {'param' : param}
         else:
             filter = {}
-        return list(self.params.find(filter))
+        return self.get_list(self.params.find(filter))
 
     def get_id(self):
         '''Get the next id
@@ -100,7 +108,7 @@ class BddOKanbans(object):
             kanban ={}
             kanban['id'] = self.get_id()
             assert proref is not None, "proref is needed to create a new kanban."
-            reference = list(self.get_references(proref))
+            reference = self.get_list(self.get_references(proref))
             assert len(reference)>0, "proref must exist to create a new kanban"
             assert len(reference)==1, f"Oups, duplicate proref in references : {reference}"
             kanban['proref'] = proref
@@ -113,7 +121,7 @@ class BddOKanbans(object):
             kanban['date_creation'] = date_creation
             self.kanbans.insert_one(kanban)            
         else:
-            kanban = list(self.kanbans.find({'id' : id}))
+            kanban = self.get_list(self.kanbans.find({'id' : id}))
             assert len(kanban)>0, "unknow id"
             assert len(kanban)==1, f"Oups, duplicate id found in kanbans: {kanban}"
             kanban = kanban[0]

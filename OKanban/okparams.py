@@ -1,12 +1,16 @@
 # coding: utf-8
 
+import logging
+import pandas as pd
+
 from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableView, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
+
 from .pandas_model import PandasModel
-import pandas as pd
 from .bdd import BddOKanbans
-import logging
+from .qtutils import Qutil
+import OKanban.okanban_app as OK_app #Evite circular import
 
 class OKParams(QWidget):
     '''paramètres pour kanbans
@@ -14,15 +18,18 @@ class OKParams(QWidget):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.font = QFont('Ubuntu', 18)
-        self.bdd = BddOKanbans('192.168.0.11')#TODO remonter ça en haut
+        self.bdd = None
         self.initUI()
-        self.load()
+        #self.load()
         
     def load(self):
         '''Load datas
         '''
+        if not self.bdd:
+            self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
         df = pd.DataFrame(self.bdd.get_params())
-        df = df.drop('_id', axis=1)
+        if not df.empty:
+            df = df.drop('_id', axis=1)
         logging.debug(df)
         model = PandasModel(df)
         self.table.setModel(model)

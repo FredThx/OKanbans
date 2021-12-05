@@ -1,23 +1,29 @@
 # coding: utf-8
 
+import logging
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QGraphicsOpacityEffect, QAction, qApp, QStackedWidget
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt, QSize, QTimer
+
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
 from .okparams import OKParams
-import logging
+from .bdd import BddOKanbans
+
 
 class OKanbanApp(QMainWindow):
     '''Une application pour Kanbans
     '''
-    def __init__(self, app, parent=None, title = "OKanbans", fullscreen = False):
+    def __init__(self, parent=None, title = "OKanbans", fullscreen = False, mode = 'tab', host = None, port = None):
         super().__init__(parent)
-        self.app = app
         self.fullscreen = fullscreen
         self.setWindowTitle(title)
         #self.setWindowFlag(Qt.FramelessWindowHint)
-        self.mode = "tab"
+        self.mode = mode
+        self.host = host
+        self.port = port
+        self.bdd = BddOKanbans(host, port)
         self.initUI()
         self.show()
 
@@ -69,6 +75,7 @@ class OKanbanApp(QMainWindow):
         self.central_widget.addWidget(self.output)
         self.params = OKParams()
         self.central_widget.addWidget(self.params)
+        self.params.load()
         self.update_mode()
 
     def update_mode(self, mode=None):
