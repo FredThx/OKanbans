@@ -1,14 +1,15 @@
 # coding: utf-8
 
 import logging
+from OKanban.okparams import OKReferences
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QGraphicsOpacityEffect, QAction, qApp, QStackedWidget
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QGraphicsOpacityEffect, QAction, qApp, QStackedWidget, QVBoxLayout
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import Qt, QSize, QTimer
 
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
-from .okparams import OKParams
+from .okparams import OKGenParams, OKReferences
 from .bdd import BddOKanbans
 
 
@@ -67,15 +68,27 @@ class OKanbanApp(QMainWindow):
         #Central Widget
         self.central_widget = QStackedWidget()
         self.setCentralWidget(self.central_widget)
+        ##tab
         self.tab = OKTab()
         self.central_widget.addWidget(self.tab)
+        ##Input
         self.input = OKInput()
         self.central_widget.addWidget(self.input)
+        ##Output
         self.output = OKOutput()
         self.central_widget.addWidget(self.output)
-        self.params = OKParams()
-        self.central_widget.addWidget(self.params)
+        ##Params
+        params_widget = QWidget()
+        params_layout = QVBoxLayout(params_widget)
+        self.central_widget.addWidget(params_widget)
+        ###Genparams
+        self.params = OKGenParams()
+        params_layout.addWidget(self.params)
         self.params.load()
+        ###Refsparams
+        self.references = OKReferences()
+        params_layout.addWidget(self.references)
+        self.references.load()
         self.update_mode()
 
     def update_mode(self, mode=None):

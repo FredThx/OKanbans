@@ -20,14 +20,21 @@ class OKParams(QWidget):
         self.font = QFont('Ubuntu', 18)
         self.bdd = None
         self.initUI()
-        #self.load()
-        
+
+    def connect(self):
+        '''Connecte the database'''
+        if not self.bdd:
+            try:
+                self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
+            except:
+                logging.error("ERROR!!!")
+                self.bdd = BddOKanbans('192.168.0.11')
+
     def load(self):
         '''Load datas
         '''
-        if not self.bdd:
-            self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
-        df = pd.DataFrame(self.bdd.get_params())
+        self.connect()        
+        df = pd.DataFrame(self.get_datas())
         if not df.empty:
             df = df.drop('_id', axis=1)
         logging.debug(df)
@@ -38,7 +45,7 @@ class OKParams(QWidget):
         self.setStyleSheet('background-color: yellow;')
         self.layout = QVBoxLayout(self)
         title_layout = QHBoxLayout()
-        self.label = QLabel("Les paramètres", self, alignment = Qt.AlignLeft)
+        self.label = QLabel(self.title, self, alignment = Qt.AlignLeft)
         self.label.setFont(self.font)
         title_layout.addWidget(self.label)
         button = QPushButton("MAJ")
@@ -49,8 +56,18 @@ class OKParams(QWidget):
         self.table.setSortingEnabled(True)
         self.layout.addWidget(self.table)
 
+class OKGenParams(OKParams):
+    '''les paramètres généraux
+    '''
+    title = "Les paramètres"
+    def get_datas(self):
+        return self.bdd.get_params()
 
-
-
+class OKReferences(OKParams):
+    '''Les références
+    '''
+    title = "Les produits"
+    def get_datas(self):
+        return self.bdd.get_references()
 
 
