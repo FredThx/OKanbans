@@ -3,7 +3,7 @@
 import logging
 
 from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIntValidator
 from PyQt5.QtCore import Qt
 
 from .qtutils import Qutil
@@ -45,6 +45,8 @@ class OKInput(OKES):
         self.layout.addWidget(label_ref, 0,0)
         self.edit_reference = QLineEdit()
         self.edit_reference.setFont(self.font)
+        self.edit_reference.textChanged.connect(self.edit_reference_change)
+        self.edit_reference.returnPressed.connect(self.bt_clicked)
         self.layout.addWidget(self.edit_reference,0,1)
         #Ligne 2 : Qté
         label_qty = QLabel("Quantité :")
@@ -52,6 +54,8 @@ class OKInput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = QLineEdit()
         self.edit_qty.setFont(self.font)
+        self.edit_qty.setValidator(QIntValidator())
+        self.edit_qty.returnPressed.connect(self.bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
         bt = QPushButton("Création")
@@ -72,8 +76,22 @@ class OKInput(OKES):
         else:
             self.edit_reference.setText("")
             self.edit_qty.setText("")
-        
-
+    
+    def edit_reference_change(self, text = ''):
+        '''Quand le text est modifié : 
+            changement de couleur si ref ok
+            initialisation de la qté
+        '''
+        logging.debug(f"edit_reference_change : {text}")
+        if text == '':
+            style = ""
+        elif len(self.bdd.get_references(text))==1:
+            style = "background-color: green;"
+            self.edit_qty.setText(str(self.bdd.get_references(text)[0].get('qte_kanban_plein')))
+        else:
+            style = "background-color: red;"
+        self.edit_reference.setStyleSheet(style)
+    
 
 class OKOutput(OKES):
     '''Une zone de saisie de Sortie

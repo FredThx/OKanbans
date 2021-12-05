@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import pymongo, datetime, logging
+import pymongo, datetime, logging, time
 from bson.decimal128 import Decimal128
 from bson.codec_options import TypeCodec
 from bson.codec_options import TypeRegistry
@@ -25,7 +25,11 @@ class BddOKanbans(object):
     date_format = "%Y-%m-%d %H:%M:%S.%f"
     param_last_id = 'last_id'
 
-    def __init__(self, host = 'localhost', port = 27017):
+    def __init__(self, host = 'localhost', port = 27017, cache_timeout = 60):
+        ''' host    :   mongodb serveur
+            port    :   mondodb port
+            cache_timeout   :   duration (seconds) for keeping data on cache
+        '''
         decimal_codec = DecimalCodec()
         type_registry = TypeRegistry([decimal_codec])
         self.codec_options = CodecOptions(type_registry=type_registry)
@@ -33,6 +37,9 @@ class BddOKanbans(object):
         self.references = self.get_collection('references')
         self.kanbans = self.get_collection('kanbans')
         self.params = self.get_collection('params')
+        self.cache_references = None
+        self.cache_references_timeout = None
+        self.cache_timeout = cache_timeout
 
     def get_collection(self, table):
         return self.bdd.get_collection(table, codec_options=self.codec_options)
@@ -64,21 +71,25 @@ class BddOKanbans(object):
             self.references.update_many(filter,{'$set' : data})
         else:
             self.references.insert_one(data)
+        self.cache_references = None
 
     def del_reference(self, proref):
         '''Delete a reference
         '''
         #TODO : vérifier si kanbans non vides existes
         self.references.delete_one({'proref' : proref})
+        self.cache_references = None
 
     def get_references(self, proref = None):
         '''get the list of all references
         '''
+        if not(self.cache_references and self.cache_references_timeout and self.cache_references_timeout > time.time()):
+            self.cache_references = self.get_list(self.references.find())
+            self.cache_references_timeout = time.time() + self.cache_timeout
         if proref:
-            filter = {'proref' : proref}
+            return [ref for ref in self.cache_references if ref.get('proref')==proref]
         else:
-            filter = {}
-        return self.get_list(self.references.find(filter))
+            return self.cache_references
     
     def get_params(self, param=None):
         '''Get [one] or all params
