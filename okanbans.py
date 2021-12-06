@@ -19,6 +19,6 @@ args = parser.parse_args()
 
 app = QApplication([])
 kanbans = OKanbanApp( **(vars(args)))
-
+kanbans.setStyleSheet(open('okanbans.css').read())
 if __name__ == '__main__':
     sys.exit(app.exec_())

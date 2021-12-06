@@ -158,7 +158,7 @@ class BddOKanbans(object):
             #TODO : ajouter historique
         self.cache_kanbans = None
     
-    def get_kanban(self, id=None, all = False):
+    def get_kanbans(self, id=None, all = False):
         '''Renvoie la liste des kanbans (limité à 1 éventuellement)
         (avec systeme cache)
         all     :   si False ou omis : uniquement les kanbans non vides

@@ -71,6 +71,7 @@ class OKanbanApp(QMainWindow):
         ##tab
         self.tab = OKTab()
         self.central_widget.addWidget(self.tab)
+        self.tab.load()
         ##Input
         self.input = OKInput()
         self.central_widget.addWidget(self.input)

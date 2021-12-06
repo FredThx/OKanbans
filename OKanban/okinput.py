@@ -158,7 +158,7 @@ class OKOutput(OKES):
         '''
         id = int(self.edit_kanban.text())
         qte_a_enlever = int(self.edit_qty.text())
-        qte_kanban = self.bdd.get_kanban(id=id)[0].get('qte')
+        qte_kanban = self.bdd.get_kanbans(id=id)[0].get('qte')
         try:
             self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
         except AssertionError as e:
@@ -175,9 +175,9 @@ class OKOutput(OKES):
         '''
         if text == '':
             style = ""
-        elif len(self.bdd.get_kanban(int(text)))==1:
+        elif len(self.bdd.get_kanbans(int(text)))==1:
             style = "background-color: green;"
-            kanban = self.bdd.get_kanban(id=int(text))[0]
+            kanban = self.bdd.get_kanbans(id=int(text))[0]
             self.edit_qty.setText(str(kanban.get('qte')))
             self.label_proref.setText(kanban.get('proref'))
         else:

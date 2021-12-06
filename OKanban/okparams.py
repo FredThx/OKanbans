@@ -3,7 +3,7 @@
 import logging
 import pandas as pd
 
-from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QTableView, QPushButton
+from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
