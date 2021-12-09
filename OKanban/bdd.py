@@ -37,6 +37,7 @@ class BddOKanbans(object):
         self.references = self.get_collection('references')
         self.kanbans = self.get_collection('kanbans')
         self.params = self.get_collection('params')
+        self.instances = self.get_collection('instances')
         self.cache_references = None
         self.cache_references_timeout = None
         self.cache_kanbans = None
@@ -177,3 +178,38 @@ class BddOKanbans(object):
                 return [k for k in self.cache_kanbans if k.get('proref')==proref]
             else:
                 return self.cache_kanbans
+    
+    def send_message_new(self, id):
+        '''Envoie à toutes les instances de l'application la notification qu'un kanban a été créé
+        '''
+        for instance in self.get_actives_apps():
+            news = instance['news'] + [id]
+            self.instances.update_one({'_id' : instance['id']},{'news' : news})
+
+    
+    def send_message_drop(self, id):
+        '''Envoie à toutes les instances de l'application la notification qu'un kanban a été supprimé
+        '''
+        for instance in self.get_actives_apps():
+            news = instance['drops'] + [id]
+            self.instances.update_one({'_id' : instance['id']},{'drops' : news})
+
+    def get_actives_apps(self):
+        '''Renvoie un cursor des instances de l'application actives
+        '''
+        return self.instances.find()
+    
+    def create_new_instance(self):
+        '''Create a new instance de l'application
+        and return the new id
+        '''
+        id = time.time()
+        self.instancse.insert_one({'id': id, 'news' :[], 'drops' : []})    
+        return id
+
+    def get_modifications(self, id):
+        '''Renvoie un tuple avec ([news, ], [drops, ])
+        '''
+        instance = self.instances.find_one({'id' : id})
+        if instance:
+            return instance.get('news'), instance.get('drops')
