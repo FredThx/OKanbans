@@ -68,3 +68,16 @@ class OKanban(QFrame):
         self.proref = self.data.get('proref')
 
 
+class EmptyOKanban(OKanban):
+    '''Un kanban vide
+    '''
+    def __init__(self, proref, parent = None):
+        super().__init__(None)
+        self.proref = ""#proref
+        self.qte = ""#0
+        
+    def load(self):
+        if self.bdd is None:
+            self.connect()
+
+    

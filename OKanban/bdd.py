@@ -158,8 +158,8 @@ class BddOKanbans(object):
             #TODO : ajouter historique
         self.cache_kanbans = None
     
-    def get_kanbans(self, id=None, all = False):
-        '''Renvoie la liste des kanbans (limité à 1 éventuellement)
+    def get_kanbans(self, id=None, proref = None, all = False):
+        '''Renvoie la liste des kanbans (limité à 1 éventuellement ou proref)
         (avec systeme cache)
         all     :   si False ou omis : uniquement les kanbans non vides
                     si True : tous les kanbans (pas de cache)
@@ -173,5 +173,7 @@ class BddOKanbans(object):
                 self.cache_kanbans_timeout = time.time() + self.cache_timeout
             if id:
                 return [k for k in self.cache_kanbans if k.get('id')==id]
+            elif proref:
+                return [k for k in self.cache_kanbans if k.get('proref')==proref]
             else:
                 return self.cache_kanbans
