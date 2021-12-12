@@ -81,6 +81,7 @@ class BddOKanbans(object):
         else:
             self.references.insert_one(data)
         self.cache_references = None
+        self.send_message_new(proref)#même quand rien n'est changé!
 
     def del_reference(self, proref):
         '''Delete a reference
@@ -88,6 +89,7 @@ class BddOKanbans(object):
         #TODO : vérifier si kanbans non vides existes
         self.references.delete_one({'proref' : proref})
         self.cache_references = None
+        self.send_message_new(proref)
 
     def get_references(self, proref = None):
         '''get the list of all references
@@ -119,12 +121,19 @@ class BddOKanbans(object):
         else:
             self.params.insert_one({'param': self.param_last_id, 'value' : value})
 
+    def del_param(self, param):
+        '''Delete a parameter
+        '''
+        result = self.params.delete_one({'param' : param})
+        logging.debug(f"Delete parameter {param} : {result.raw_result}")
+        self.cache_params = None
+
     def get_id(self):
         '''Get the next id
         '''
         result = self.get_params(self.param_last_id)
         if result:
-            id = result[0].get('value',0) + 1
+            id = int(result[0].get('value',0)) + 1
         else:
             id = 1
         self.set_params(self.param_last_id, id)

@@ -49,7 +49,11 @@ class DFTableWidget(QTableWidget):
 
     def updateDF(self, row, column):
         text = self.item(row, column).text()
-        self.df.iloc[row, column] = text
+        try:
+            val = type(self.df.iloc[row, column])(text)
+        except ValueError:
+            val = text
+        self.df.iloc[row, column] = val
 
     def newRow(self):
         '''Add a new row
@@ -92,11 +96,6 @@ class DFEditor(QWidget):
         button_new.setStyleSheet('font-size: 24px')
         button_new.clicked.connect(self.newRow)
         buttonLayout.addWidget(button_new)     
-
-#        button_load = QPushButton('Actualiser')
-#        button_load.setStyleSheet('font-size: 24px')
-        #button_load.clicked.connect(self.load) #todo connecter 
-#        buttonLayout.addWidget(button_load)   
 
         mainLayout.addLayout(buttonLayout)
         self.setLayout(mainLayout)

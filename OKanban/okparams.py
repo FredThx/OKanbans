@@ -35,6 +35,7 @@ class OKParams(QWidget):
             df = df.drop('_id', axis=1)
         logging.debug(df)
         self.table.load(df)
+
     
     def initUI(self):
         #self.setStyleSheet('background-color: yellow;')
@@ -43,9 +44,12 @@ class OKParams(QWidget):
         self.label = QLabel(self.title, self, alignment = Qt.AlignLeft)
         self.label.setFont(self.font)
         title_layout.addWidget(self.label)
-        button = QPushButton("MAJ")
-        button.clicked.connect(self.load)
-        title_layout.addWidget(button)
+        button1 = QPushButton("Recharger les données")
+        button1.clicked.connect(self.load)
+        title_layout.addWidget(button1)
+        button2 = QPushButton("Sauver les modifications")
+        button2.clicked.connect(self.save)
+        title_layout.addWidget(button2)
         self.layout.addLayout(title_layout)
         self.table = DFEditor(self)
         self.table.setStyleSheet('font-size: 18px;')
@@ -58,6 +62,19 @@ class OKGenParams(OKParams):
     title = "Les paramètres"
     def get_datas(self):
         return self.bdd.get_params()
+    
+    def save(self):
+        '''Save the data to the bdd
+        '''
+        logging.info(f"Save data : {self.table.df}")
+        #Ajout & modifications
+        for index, row in self.table.df.iterrows():
+            self.bdd.set_params(row['param'], row['value'])
+        #Suppression
+        for o_param in self.bdd.get_params():
+            param = o_param.get('param')
+            if not param in self.table.df['param'].tolist():
+                self.bdd.del_param(param)
 
 class OKReferences(OKParams):
     '''Les références
@@ -66,4 +83,18 @@ class OKReferences(OKParams):
     def get_datas(self):
         return self.bdd.get_references()
 
+    def save(self):
+        '''Save the data to the bdd
+        '''
+        logging.info(f"Save data : {self.table.df}")
+        #Ajout et modifications
+        for index, row in self.table.df.iterrows():
+            self.bdd.set_reference(row['proref'], row['qte_kanban_plein'], row['nb_max'], row['nb_alerte'])
+        #Suppression
+        for o_rererence in self.bdd.get_references():
+            proref = o_rererence.get('proref')
+            if not proref in self.table.df['proref'].tolist():
+                self.bdd.del_reference(proref)
+        #Mise à jours des clients
+        
 

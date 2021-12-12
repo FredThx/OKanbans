@@ -150,6 +150,7 @@ class OKanbanApp(QMainWindow):
         '''
         news, drops = self.bdd.get_messages(self.id)
         if news or drops:
+            logging.info(f"New data on bdd : {news}, {drops}")
             self.bdd.cache_clear()
             self.load()
 
