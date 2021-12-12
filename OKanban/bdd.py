@@ -44,6 +44,12 @@ class BddOKanbans(object):
         self.cache_kanbans_timeout = None
         self.cache_timeout = cache_timeout
 
+    def cache_clear(self):
+        '''Clear all caches : references, kanbans
+        '''
+        self.cache_references = None
+        self.cache_kanbans = None
+        
     def get_collection(self, table):
         return self.bdd.get_collection(table, codec_options=self.codec_options)
     
@@ -127,8 +133,8 @@ class BddOKanbans(object):
     def set_kanban(self, id = None, proref = None, qte = None, date_creation = None):
         ''' Create or change a kanban
         '''
+        kanban ={}
         if id is None:
-            kanban ={}
             kanban['id'] = self.get_id()
             assert proref is not None, "proref is needed to create a new kanban."
             reference = self.get_list(self.get_references(proref))
@@ -158,6 +164,7 @@ class BddOKanbans(object):
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})
             #TODO : ajouter historique
         self.cache_kanbans = None
+        self.send_message_new(kanban['id'])
     
     def get_kanbans(self, id=None, proref = None, all = False):
         '''Renvoie la liste des kanbans (limité à 1 éventuellement ou proref)
@@ -184,15 +191,15 @@ class BddOKanbans(object):
         '''
         for instance in self.get_actives_apps():
             news = instance['news'] + [id]
-            self.instances.update_one({'_id' : instance['id']},{'news' : news})
-
+            self.instances.update_one({'id' : instance['id']},{'$set' : {'news' : news}})
+            logging.debug(f"Add new for instance {instance['id']} : {id}. news = {news}")
     
     def send_message_drop(self, id):
         '''Envoie à toutes les instances de l'application la notification qu'un kanban a été supprimé
         '''
         for instance in self.get_actives_apps():
             news = instance['drops'] + [id]
-            self.instances.update_one({'_id' : instance['id']},{'drops' : news})
+            self.instances.update_one({'id' : instance['id']},{'$set': {'drops' : news}})
 
     def get_actives_apps(self):
         '''Renvoie un cursor des instances de l'application actives
@@ -204,12 +211,22 @@ class BddOKanbans(object):
         and return the new id
         '''
         id = time.time()
-        self.instancse.insert_one({'id': id, 'news' :[], 'drops' : []})    
+        self.instances.insert_one({'id': id, 'news' :[], 'drops' : []})
+        logging.info(f"New instance in bdd : id={id}")
         return id
+    
+    def delete_instance(self, id):
+        '''Delete the instance
+        '''
+        result = self.instances.delete_one({'id' : id})
+        logging.info(f"Delete instance in bdd : {result.raw_result}")
+        return result
 
-    def get_modifications(self, id):
+    def get_messages(self, id):
         '''Renvoie un tuple avec ([news, ], [drops, ])
         '''
         instance = self.instances.find_one({'id' : id})
         if instance:
-            return instance.get('news'), instance.get('drops')
+            news, drops = instance.get('news'), instance.get('drops')
+            self.instances.update_one({'id' : instance['id']},{'$set': {'news' : [], 'drops' : []}})            
+            return news, drops

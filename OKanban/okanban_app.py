@@ -1,11 +1,10 @@
 # coding: utf-8
 
-import logging
-from OKanban.okparams import OKReferences
+import logging, time
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QGraphicsOpacityEffect, QAction, qApp, QStackedWidget, QVBoxLayout
-from PyQt5.QtGui import QPixmap, QFont
-from PyQt5.QtCore import Qt, QSize, QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout
+#from PyQt5.QtGui import x
+from PyQt5.QtCore import QTimer
 
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
@@ -25,8 +24,19 @@ class OKanbanApp(QMainWindow):
         self.host = host
         self.port = port
         self.bdd = BddOKanbans(host, port)
+        self.widgets = []
         self.initUI()
         self.show()
+        self.id = None
+        self.load()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.on_timer)
+        self.timer.start(1000)
+
+    def closeEvent(self, event):
+        '''Supprime inscription à la bdd
+        '''
+        self.bdd.delete_instance(self.id)
 
     def initUI(self):
         '''Création des composants graphiques
@@ -71,15 +81,15 @@ class OKanbanApp(QMainWindow):
         ##tab
         self.tab = OKTab()
         self.central_widget.addWidget(self.tab)
-        self.tab.load()
+        self.widgets.append(self.tab)
         ##Input
         self.input = OKInput()
         self.central_widget.addWidget(self.input)
-        self.input.connect()
+        self.widgets.append(self.input)
         ##Output
         self.output = OKOutput()
         self.central_widget.addWidget(self.output)
-        self.output.connect()
+        self.widgets.append(self.output)
         ##Params
         params_widget = QWidget()
         params_layout = QVBoxLayout(params_widget)
@@ -87,12 +97,20 @@ class OKanbanApp(QMainWindow):
         ###Genparams
         self.params = OKGenParams()
         params_layout.addWidget(self.params)
-        self.params.load()
+        self.widgets.append(self.params)
         ###Refsparams
         self.references = OKReferences()
         params_layout.addWidget(self.references)
-        self.references.load()
+        self.widgets.append(self.references)
         self.update_mode()
+
+    def load(self):
+        '''Load all widgets with data
+        '''
+        if self.id is None:
+            self.id = self.bdd.create_new_instance()
+        for w in self.widgets:
+            w.load()
 
     def update_mode(self, mode=None):
         ''' Change the mode
@@ -127,6 +145,13 @@ class OKanbanApp(QMainWindow):
             self.mode = 'params'
         self.update_mode()
 
+    def on_timer(self):
+        '''Vérifie s'il y a des modification dasn la bdd
+        '''
+        news, drops = self.bdd.get_messages(self.id)
+        if news or drops:
+            self.bdd.cache_clear()
+            self.load()
 
 if __name__ == '__main__':
     app = QApplication([])

@@ -25,12 +25,12 @@ class OKES(QWidget):
         self.layout.setHorizontalSpacing(20)
         self.setLayout(self.layout)
 
-
     def connect(self):
         '''Connecte the database'''
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
-    
+    load = connect
+        
 class OKInput(OKES):
     '''Une zone de saisie d'entree en stock
     '''
