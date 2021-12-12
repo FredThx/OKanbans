@@ -10,14 +10,15 @@ my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
 logging.info('OKanban gui start')
 
 parser = argparse.ArgumentParser(description='La gestion des kanbans pour Olfa')
-parser.add_argument('title', action='store', help = "Titre de l'application", nargs='?')
-parser.add_argument('fullscreen', action='store_false', help = "fullscreen mode")
-parser.add_argument('mode', action='store', help = "mode : tab|input|output", nargs='?', default = 'tab')
-parser.add_argument('host', action='store', help = "IP bdd", nargs='?', default = '192.168.0.11')
+parser.add_argument('-t', '--title', action='store', help = "Titre de l'application", nargs='?')
+parser.add_argument('-f', '--fullscreen', action='store_true', help = "fullscreen mode")
+parser.add_argument('-m', '--mode', action='store', help = "mode : tab|input|output", nargs='?', default = 'tab')
+parser.add_argument('-H', '--host', action='store', help = "IP bdd", nargs='?', default = '192.168.0.11')
 
 args = parser.parse_args()
 
 app = QApplication([])
+logging.info(f"Open okanbans with args : {vars(args)}")
 kanbans = OKanbanApp( **(vars(args)))
 kanbans.setStyleSheet(open('okanbans.css').read())
 if __name__ == '__main__':
