@@ -26,6 +26,7 @@ class OKanban(QFrame):
         self._proref = None
         self.initUI()
         self.id = id
+        self.alert = False
 
     def __str__(self):
         return f"OKanban({self._proref}-{self._qte}-id={self._id})"
@@ -81,7 +82,9 @@ class OKanban(QFrame):
         self.data = self.bdd.get_kanbans(self.id)[0]
         self.qte = self.data.get('qte')
         self.proref = self.data.get('proref')
-
+    
+    def set_alert(self, alert):
+        pass
 
 class EmptyOKanban(OKanban):
     '''Un kanban vide
@@ -97,6 +100,12 @@ class EmptyOKanban(OKanban):
 
     def load(self):
         if self.bdd is None:
-            self.connect()
-
+            self.connect()    
     
+    def set_alert(self, alert):
+        logging.debug(f"{self} is on alert mode {alert}")
+        if alert:
+            self.setStyleSheet('background-color: red;')
+        else:
+            self.setStyleSheet('background-color: green;')
+        self.alert = alert #Tentative de gérer ça via css!

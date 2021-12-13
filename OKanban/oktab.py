@@ -130,8 +130,14 @@ class OKProd(OKbase)        :
             logging.debug("delete empty kanbans")
         #Order layout
         i = 0
-        while i < len(kanbans):
-            if isinstance(self.layout.itemAt(i).widget(), EmptyOKanban):
+        size = max(self.data.get('nb_max',0),len(kanbans))
+        #while i < len(kanbans):
+        while i < size - len(kanbans):
+            #if isinstance(self.layout.itemAt(i).widget(), EmptyOKanban):
+            if type(self.layout.itemAt(i).widget()) == OKanban:
                 self.layout.addItem(self.layout.takeAt(i)) #Put the EmptyOKAnban to the end
             else:
                 i += 1
+        #Colorisation des EmptyOKanbans
+        for i in range(size):
+            self.layout.itemAt(i).widget().set_alert(i > self.data.get('nb_alerte',0))
