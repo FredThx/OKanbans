@@ -1,0 +1,12 @@
+* vider les instances plantées :
+    * au démmarage de l'appli
+        * Envoyer un message 'test' dans news
+        * attendre un peu
+        * supprimer les insances qui ont encore "test" dans la file d'attente
+* Ameliorer l'affichage tableau
+    * ajout ascensseurs H+V
+    * ajout taille mini kanbans
+    * par référence :
+        * si trop de kanbans : sur 2 colones
+    * les petites références : les mettres les unes sur les autres
+    * pouvoir modifier l'ordre des références

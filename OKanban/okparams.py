@@ -3,7 +3,7 @@
 import logging
 import pandas as pd
 
-from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import  QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
@@ -88,13 +88,18 @@ class OKReferences(OKParams):
         '''
         logging.info(f"Save data : {self.table.df}")
         #Ajout et modifications
+        result = True
         for index, row in self.table.df.iterrows():
-            self.bdd.set_reference(row['proref'], row['qte_kanban_plein'], row['nb_max'], row['nb_alerte'])
+            try:
+                self.bdd.set_reference(row['proref'], int(row['qte_kanban_plein']), int(row['nb_max']), int(row['nb_alerte']))
+            except ValueError:
+                result = False
         #Suppression
         for o_rererence in self.bdd.get_references():
             proref = o_rererence.get('proref')
             if not proref in self.table.df['proref'].tolist():
                 self.bdd.del_reference(proref)
-        #Mise à jours des clients
+        if not result: # Autre solution : des validators
+            QMessageBox.warning(self, "Paramètres OKanbans", "Erreur dans les données : les valeurs doivent être des entiers")
         
 

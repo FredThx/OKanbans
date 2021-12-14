@@ -1,14 +1,19 @@
 OKanban {
     border: 1px solid black;
     border-radius: 10px;
-    background-color: darkCyan;
+    background-color: rgb(150, 220, 160);
 }
+
+OKanban[alerte_haut = "true"] {
+    background-color: darkcyan;
+}
+
 EmptyOKanban {
     border: 1px solid black;
     border-radius: 10px;
-    background-color: rgb(214, 228, 228);
+    background-color: rgb(240, 255, 200);
 }
 
 EmptyOKanban[alert="true"]{
-    background-color: rgb(245, 3, 72);
+    background-color: rgb(200, 50, 100);
 }

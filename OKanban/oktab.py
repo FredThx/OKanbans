@@ -128,9 +128,10 @@ class OKProd(OKbase)        :
             w.deleteLater()
             nb_deleted_empty_kanbans += 1
             logging.debug("delete empty kanbans")
+        ##Finitions
+        size = max(self.data.get('nb_max',0),len(kanbans))
         #Order layout
         i = 0
-        size = max(self.data.get('nb_max',0),len(kanbans))
         #while i < len(kanbans):
         while i < size - len(kanbans):
             #if isinstance(self.layout.itemAt(i).widget(), EmptyOKanban):
@@ -138,6 +139,10 @@ class OKProd(OKbase)        :
                 self.layout.addItem(self.layout.takeAt(i)) #Put the EmptyOKAnban to the end
             else:
                 i += 1
-        #Colorisation des EmptyOKanbans
+        #Colorisation des Kanbans
+        seuil_alerte = self.data.get('nb_max',0) - self.data.get('nb_alerte',0)
         for i in range(size):
-            self.layout.itemAt(i).widget().set_alert(i > self.data.get('nb_alerte',0))
+            #Zone d'alerte stock bas
+            self.layout.itemAt(i).widget().set_alert(i >= seuil_alerte)
+            #Zone d'alerte stokc trop haut
+            self.layout.itemAt(i).widget().set_alerte_haut(i >= self.data.get('nb_max',0))

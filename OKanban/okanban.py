@@ -27,6 +27,7 @@ class OKanban(QFrame):
         self.initUI()
         self.id = id
         self.alert = False
+        self.alert_haut = False
 
     def __str__(self):
         return f"OKanban({self._proref}-{self._qte}-id={self._id})"
@@ -54,20 +55,20 @@ class OKanban(QFrame):
     @id.setter
     def id(self, value):
         self._id = value
-        self.label_id.setText(f"id:{self._id}")
+        self.setToolTip(f"id:{self._id or 'vide'}")
 
     def initUI(self):
-        layout = QVBoxLayout(self)
-        self.label_id = QLabel()
-        self.label_id.setFont(self.font)
-        layout.addWidget(self.label_id)
+        layout = QHBoxLayout(self)
+        #self.label_id = QLabel()
+        #self.label_id.setFont(self.font)
+        #layout.addWidget(self.label_id)
         self.label_qte = QLabel()
         self.label_qte.setFont(self.font)
         layout.addWidget(self.label_qte)
         self.label_proref = QLabel()
         self.label_proref.setFont(self.font)
         layout.addWidget(self.label_proref)
-        self.setFixedSize(80,60)
+        #self.setFixedSize(80,60)
 
     def connect(self):
         '''Connecte the database'''
@@ -85,6 +86,15 @@ class OKanban(QFrame):
     
     def set_alert(self, alert):
         pass
+    
+    def set_alerte_haut(self, alert):
+        logging.debug(f"{self} is on alert mode {alert}")
+        if alert:
+            self.setStyleSheet('background-color: darkCyan;')
+        else:
+            self.setStyleSheet('background-color: rgb(150, 220, 160);')
+        self.alert_haut = alert #Tentative de gérer ça via css!
+
 
 class EmptyOKanban(OKanban):
     '''Un kanban vide
@@ -105,7 +115,10 @@ class EmptyOKanban(OKanban):
     def set_alert(self, alert):
         logging.debug(f"{self} is on alert mode {alert}")
         if alert:
-            self.setStyleSheet('background-color: red;')
+            self.setStyleSheet('background-color: rgb(200,50,100);')
         else:
-            self.setStyleSheet('background-color: green;')
+            self.setStyleSheet('background-color : rgb(240, 255, 200);')
         self.alert = alert #Tentative de gérer ça via css!
+
+    def set_alerte_haut(self, alert):
+        pass
