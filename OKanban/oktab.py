@@ -1,15 +1,15 @@
 # coding: utf-8
 import logging
 
-from PyQt5.QtWidgets import QSpacerItem, QVBoxLayout,QHBoxLayout, QWidget, QLabel, QWidgetItem
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QVBoxLayout,QHBoxLayout, QWidget, QLabel, QFrame
+#from PyQt5.QtCore import Qt
 
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
 from .bdd import BddOKanbans
 from .okanban import OKanban, EmptyOKanban
 
-class OKbase(QWidget):
+class OKbase(QFrame):
     def connect(self):
         '''Connecte the database'''
         if not self.bdd:
@@ -92,7 +92,6 @@ class OKProd(OKbase)        :
         self.main_layout.addLayout(self.layout)
         self.main_layout.addStretch()
 
-
     def load(self):
         '''Load or update
         '''
@@ -141,6 +140,6 @@ class OKProd(OKbase)        :
         seuil_alerte = self.data.get('nb_max',0) - self.data.get('nb_alerte',0)
         for i in range(size):
             #Zone d'alerte stock bas
-            self.layout.itemAt(i).widget().set_alert(i >= seuil_alerte)
-            #Zone d'alerte stokc trop haut
-            self.layout.itemAt(i).widget().set_alerte_haut(i >= self.data.get('nb_max',0))
+            self.layout.itemAt(i).widget().alert = (i >= seuil_alerte)
+            #Zone d'alerte stock trop haut
+            self.layout.itemAt(i).widget().alert_haut = (i >= self.data.get('nb_max',0))
