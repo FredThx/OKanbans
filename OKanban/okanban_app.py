@@ -4,7 +4,7 @@ import logging, time
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout
 #from PyQt5.QtGui import x
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QThread, QObject
 
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
@@ -24,10 +24,11 @@ class OKanbanApp(QMainWindow):
         self.host = host
         self.port = port
         self.bdd = BddOKanbans(host, port)
+        self.id = None
+        self.on_start()
         self.widgets = []
         self.initUI()
         self.show()
-        self.id = None
         self.load()
         self.timer = QTimer()
         self.timer.timeout.connect(self.on_timer)
@@ -37,6 +38,15 @@ class OKanbanApp(QMainWindow):
         '''Supprime inscription à la bdd
         '''
         self.bdd.delete_instance(self.id)
+
+    def on_start(self):
+        '''Lance le thread on_start()
+        '''
+        self.worker = OKanbanWorker(self)
+        self.on_start_thread = QThread()
+        self.worker.moveToThread(self.on_start_thread)
+        self.on_start_thread.started.connect(self.worker.on_start)
+        self.on_start_thread.start()
 
     def initUI(self):
         '''Création des composants graphiques
@@ -146,7 +156,7 @@ class OKanbanApp(QMainWindow):
         self.update_mode()
 
     def on_timer(self):
-        '''Vérifie s'il y a des modification dasn la bdd
+        '''Vérifie s'il y a des modification dans la bdd
         '''
         news, drops = self.bdd.get_messages(self.id)
         if news or drops:
@@ -154,6 +164,28 @@ class OKanbanApp(QMainWindow):
             self.bdd.cache_clear()
             self.load()
 
+class OKanbanWorker(QObject):
+    '''Un objet pour executer du code en //
+    '''
+    def __init__(self, parent, **kwargs):
+        super().__init__(**kwargs)
+        self.app = parent
+        logging.debug(f"{self} created.")
+
+    def on_start(self):
+        '''Taches à la connection :
+        - clean instances
+        '''
+        logging.info("on_start thread start...")
+        while self.app.id is None:
+            time.sleep(1)
+        self.app.bdd.clean_instances(self.app.id)
+
+
 if __name__ == '__main__':
     app = QApplication([])
     fenetre = OKanbanApp(app)
+
+
+
+

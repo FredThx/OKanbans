@@ -239,3 +239,14 @@ class BddOKanbans(object):
             news, drops = instance.get('news'), instance.get('drops')
             self.instances.update_one({'id' : instance['id']},{'$set': {'news' : [], 'drops' : []}})            
             return news, drops
+
+    def clean_instances(self, my_id=None, timeout = 10):
+        '''Delete not actives instances.
+        '''
+        logging.info("Clean instances...")
+        self.send_message_new('_')
+        time.sleep(timeout)
+        for instance in self.get_actives_apps():
+            if instance.get('id') != my_id and '_' in instance.get('news',[]):
+                self.delete_instance(instance.get('id'))
+        logging.info("... Clean instances end")

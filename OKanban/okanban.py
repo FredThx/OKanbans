@@ -88,7 +88,7 @@ class OKanban(QFrame):
         pass
     
     def set_alerte_haut(self, alert):
-        logging.debug(f"{self} is on alert mode {alert}")
+        #logging.debug(f"{self} is on alert mode {alert}")
         if alert:
             self.setStyleSheet('background-color: darkCyan;')
         else:
@@ -113,7 +113,7 @@ class EmptyOKanban(OKanban):
             self.connect()    
     
     def set_alert(self, alert):
-        logging.debug(f"{self} is on alert mode {alert}")
+        #logging.debug(f"{self} is on alert mode {alert}")
         if alert:
             self.setStyleSheet('background-color: rgb(200,50,100);')
         else:

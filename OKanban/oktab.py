@@ -120,14 +120,12 @@ class OKProd(OKbase)        :
             o_kanban = EmptyOKanban(proref = self.data.get('proref'))
             self.layout.addWidget(o_kanban)
             o_kanban.load()#ne fait rien
-            logging.debug("add empty kanbans")
         #Suppression des Kanbans vide en trop
         nb_deleted_empty_kanbans = 0
         while self.get_ok_widgets(EmptyOKanban) and len(kanbans) + len(self.get_ok_widgets(EmptyOKanban)) - nb_deleted_empty_kanbans > self.data.get('nb_max',0):
             w = self.get_ok_widgets(EmptyOKanban)[-1]
             w.deleteLater()
             nb_deleted_empty_kanbans += 1
-            logging.debug("delete empty kanbans")
         ##Finitions
         size = max(self.data.get('nb_max',0),len(kanbans))
         #Order layout

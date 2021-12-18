@@ -33,7 +33,6 @@ class OKParams(QWidget):
         df = pd.DataFrame(self.get_datas())
         if not df.empty:
             df = df.drop('_id', axis=1)
-        logging.debug(df)
         self.table.load(df)
 
     
