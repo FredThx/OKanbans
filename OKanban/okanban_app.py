@@ -2,7 +2,7 @@
 
 import logging, time
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea
 #from PyQt5.QtGui import x
 from PyQt5.QtCore import QTimer, QThread, QObject
 
@@ -15,7 +15,7 @@ from .bdd import BddOKanbans
 class OKanbanApp(QMainWindow):
     '''Une application pour Kanbans
     '''
-    def __init__(self, parent=None, title = "OKanbans", fullscreen = False, mode = 'tab', host = None, port = None):
+    def __init__(self, parent=None, title = "OKanbans", fullscreen = False, mode = 'tab', host = None, port = None, style = None):
         super().__init__(parent)
         self.fullscreen = fullscreen
         self.setWindowTitle(title)
@@ -23,6 +23,7 @@ class OKanbanApp(QMainWindow):
         self.mode = mode
         self.host = host
         self.port = port
+        self.style = style
         self.bdd = BddOKanbans(host, port)
         self.id = None
         self.on_start()
@@ -121,6 +122,19 @@ class OKanbanApp(QMainWindow):
             self.id = self.bdd.create_new_instance()
         for w in self.widgets:
             w.load()
+        self.set_style()
+
+    def set_style(self, style = None):
+        '''Applique le style 
+        '''
+        style = style or self.style
+        if style:
+            try:
+                self.setStyleSheet(open(style).read())
+            except FileNotFoundError as e:
+                logging.error(e)
+            #else:
+                #logging.debug(f"Style {style} applied")
 
     def update_mode(self, mode=None):
         ''' Change the mode
@@ -163,6 +177,7 @@ class OKanbanApp(QMainWindow):
             logging.info(f"New data on bdd : {news}, {drops}")
             self.bdd.cache_clear()
             self.load()
+        self.set_style()
 
 class OKanbanWorker(QObject):
     '''Un objet pour executer du code en //

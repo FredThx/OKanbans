@@ -3,7 +3,7 @@
 import logging
 
 from PyQt5.QtWidgets import  QFrame, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty
 from PyQt5.QtGui import QFont
 
 from .qtutils import Qutil
@@ -26,8 +26,8 @@ class OKanban(QFrame):
         self._proref = None
         self.initUI()
         self.id = id
-        self.alert = False
-        self.alert_haut = False
+        self._alert = False
+        self._alert_haut = False
 
     def __str__(self):
         return f"OKanban({self._proref}-{self._qte}-id={self._id})"
@@ -84,17 +84,21 @@ class OKanban(QFrame):
         self.qte = self.data.get('qte')
         self.proref = self.data.get('proref')
     
-    def set_alert(self, alert):
-        pass
+    @pyqtProperty(bool)
+    def alert(self):
+        return self._alert
     
-    def set_alerte_haut(self, alert):
-        #logging.debug(f"{self} is on alert mode {alert}")
-        if alert:
-            self.setStyleSheet('background-color: darkCyan;')
-        else:
-            self.setStyleSheet('background-color: rgb(150, 220, 160);')
-        self.alert_haut = alert #Tentative de gérer ça via css!
-
+    @alert.setter
+    def alert(self, value):
+        self._alert = value
+    
+    @pyqtProperty(bool)
+    def alert_haut(self):
+        return self._alert_haut
+    
+    @alert_haut.setter
+    def alert_haut(self, value):
+        self._alert_haut = value
 
 class EmptyOKanban(OKanban):
     '''Un kanban vide
@@ -112,13 +116,3 @@ class EmptyOKanban(OKanban):
         if self.bdd is None:
             self.connect()    
     
-    def set_alert(self, alert):
-        #logging.debug(f"{self} is on alert mode {alert}")
-        if alert:
-            self.setStyleSheet('background-color: rgb(200,50,100);')
-        else:
-            self.setStyleSheet('background-color : rgb(240, 255, 200);')
-        self.alert = alert #Tentative de gérer ça via css!
-
-    def set_alerte_haut(self, alert):
-        pass

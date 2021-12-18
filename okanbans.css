@@ -4,7 +4,7 @@ OKanban {
     background-color: rgb(150, 220, 160);
 }
 
-OKanban[alerte_haut = "true"] {
+OKanban[alert_haut = "true"] {
     background-color: darkcyan;
 }
 
@@ -16,4 +16,9 @@ EmptyOKanban {
 
 EmptyOKanban[alert="true"]{
     background-color: rgb(200, 50, 100);
+}
+
+OKProd {
+    border : 2px solid rgb(130, 153, 88);
+    border-radius: 5px;
 }

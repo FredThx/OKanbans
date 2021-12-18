@@ -14,12 +14,12 @@ parser.add_argument('-t', '--title', action='store', help = "Titre de l'applicat
 parser.add_argument('-f', '--fullscreen', action='store_true', help = "fullscreen mode")
 parser.add_argument('-m', '--mode', action='store', help = "mode : tab|input|output", nargs='?', default = 'tab')
 parser.add_argument('-H', '--host', action='store', help = "IP bdd", nargs='?', default = '192.168.0.11')
+parser.add_argument('-s', '--style', action = 'store', help = 'style (fichier css', nargs = '?', default = 'okanbans.css')
 
 args = parser.parse_args()
 
 app = QApplication([])
 logging.info(f"Open okanbans with args : {vars(args)}")
 kanbans = OKanbanApp( **(vars(args)))
-kanbans.setStyleSheet(open('okanbans.css').read())
 if __name__ == '__main__':
     sys.exit(app.exec_())
