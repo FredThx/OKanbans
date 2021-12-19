@@ -69,8 +69,33 @@ class OKTab(OKbase):
                 ok_produit.load()
         #Delete old products
             #TODO
+        #self.rearrange()
         self.layout.addStretch()
             
+    def rearrange(self):
+        '''Pour gagner place et lisibilité
+        déplace les "petits" OKProd dans des colonnes multi produits
+        '''
+        okprods = self.get_ok_widgets(OKProd)
+        max_size = max([p.size for p in okprods])
+        index = 0
+        offset = 0
+        while index < len(okprods)-1:
+            if okprods[index].size + okprods[index+1].size < max_size -2:
+                p1 = self.layout.takeAt(index-offset)
+                p2 = self.layout.takeAt(index-offset)
+                layout = QVBoxLayout(self)
+                layout.addItem(p1)
+                layout.addItem(p2)
+                layout.addStretch()
+                self.layout.addLayout(layout)
+                index += 2
+                offset +=2
+            else:
+                index +=1
+
+        
+
 
 class OKProd(OKbase)        :
     ''' Un colonne contenant un produit
@@ -79,10 +104,12 @@ class OKProd(OKbase)        :
         super().__init__(parent)
         self.bdd = None
         self.data = data
+        self.size = 0
         self.initUI()
         
     def __str__(self):
         return f"OKProd({self.data.get('proref')})"
+
 
     def initUI(self):
         self.main_layout = QVBoxLayout(self)
@@ -126,19 +153,18 @@ class OKProd(OKbase)        :
             w.deleteLater()
             nb_deleted_empty_kanbans += 1
         ##Finitions
-        size = max(self.data.get('nb_max',0),len(kanbans))
+        self.size = max(self.data.get('nb_max',0),len(kanbans))
         #Order layout
         i = 0
         #while i < len(kanbans):
-        while i < size - len(kanbans):
-            #if isinstance(self.layout.itemAt(i).widget(), EmptyOKanban):
+        while i < self.size - len(kanbans):
             if type(self.layout.itemAt(i).widget()) == OKanban:
                 self.layout.addItem(self.layout.takeAt(i)) #Put the EmptyOKAnban to the end
             else:
                 i += 1
         #Colorisation des Kanbans
         seuil_alerte = self.data.get('nb_max',0) - self.data.get('nb_alerte',0)
-        for i in range(size):
+        for i in range(self.size):
             #Zone d'alerte stock bas
             self.layout.itemAt(i).widget().alert = (i >= seuil_alerte)
             #Zone d'alerte stock trop haut
