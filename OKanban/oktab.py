@@ -1,7 +1,7 @@
 # coding: utf-8
 import logging
 
-from PyQt5.QtWidgets import QVBoxLayout,QHBoxLayout, QWidget, QLabel, QFrame
+from PyQt5.QtWidgets import QVBoxLayout,QHBoxLayout, QWidget, QLabel, QFrame, QLayout
 #from PyQt5.QtCore import Qt
 
 from .qtutils import Qutil
@@ -15,32 +15,23 @@ class OKbase(QFrame):
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
     
-    def get_ok_widgets(self, w_class = None, strict = False, widget = True, index = False):
+    def get_ok_widgets(self, w_class = None, strict = False, layout = None, recursif = True):
         '''Return all OKprod widgets
             strict      :   if True : type() is use vs isinstance()
-            widget      :   if False, the item is use
-                            if True, the item.widget is use
-            index       :   if True return the list of index (vs the widget or the item)
         '''
         okprods = []
-        indexs = []
-        for i in range(self.layout.count()):
-            if widget:
-                w = self.layout.itemAt(i).widget()
-            else:
-                w = self.layout.itemAt(i)
-            if strict:
-                if w_class is None or type(w) == w_class:
-                    okprods.append(w)
-                    indexs.append(i)
-            else:
-                if w_class is None or isinstance(w, w_class):
-                    okprods.append(w)
-                    indexs.append(i)
-        if index:
-            return indexs
-        else:
-            return okprods
+        if layout is None:
+            layout = self.layout
+        for i in range(layout.count()):
+            w = layout.itemAt(i).widget()
+            if w_class is None or (strict and type(w) == w_class) or (not strict and isinstance(w, w_class)):
+                okprods.append(w)
+            elif w is None and isinstance(layout.itemAt(i), QLayout):
+                if recursif:
+                    okprods += self.get_ok_widgets(w_class, strict, layout = layout.itemAt(i))
+                else:
+                    okprods.append(layout.itemAt(i))
+        return okprods
 
 class OKTab(OKbase):
     '''Tableau des kanbans
@@ -69,28 +60,31 @@ class OKTab(OKbase):
                 ok_produit.load()
         #Delete old products
             #TODO
-        #self.rearrange()
+        self.rearrange()
         self.layout.addStretch()
             
     def rearrange(self):
         '''Pour gagner place et lisibilité
         déplace les "petits" OKProd dans des colonnes multi produits
         '''
-        okprods = self.get_ok_widgets(OKProd)
-        max_size = max([p.size for p in okprods])
+        okprods = self.get_ok_widgets(OKProd, recursif=False)
+        max_size = max([p.size for p in okprods if isinstance(p,OKProd)])
         index = 0
         offset = 0
         while index < len(okprods)-1:
-            if okprods[index].size + okprods[index+1].size < max_size -2:
-                p1 = self.layout.takeAt(index-offset)
-                p2 = self.layout.takeAt(index-offset)
-                layout = QVBoxLayout(self)
-                layout.addItem(p1)
-                layout.addItem(p2)
-                layout.addStretch()
-                self.layout.addLayout(layout)
-                index += 2
-                offset +=2
+            if isinstance(okprods[index],OKProd) and isinstance(okprods[index+1],OKProd):
+                if okprods[index].size + okprods[index+1].size < max_size -2:
+                    p1 = self.layout.takeAt(index-offset)
+                    p2 = self.layout.takeAt(index-offset)
+                    layout = QVBoxLayout(self)
+                    layout.addItem(p1)
+                    layout.addItem(p2)
+                    layout.addStretch()
+                    self.layout.addLayout(layout)
+                    index += 2
+                    offset +=2
+                else:
+                    index +=1
             else:
                 index +=1
 

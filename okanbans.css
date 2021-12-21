@@ -22,3 +22,7 @@ OKProd {
     border : 2px solid rgb(130, 153, 88);
     border-radius: 5px;
 }
+
+OKProd::lb_proref{
+    font-weight: bold;
+}
