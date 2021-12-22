@@ -91,7 +91,7 @@ class OKTab(OKbase):
         
 
 
-class OKProd(OKbase)        :
+class OKProd(OKbase):
     ''' Un colonne contenant un produit
     '''
     def __init__(self, data, parent = None):
@@ -107,11 +107,17 @@ class OKProd(OKbase)        :
 
     def initUI(self):
         self.main_layout = QVBoxLayout(self)
-        self.lb_proref = QLabel(self.data.get('proref'))
+        self.lb_proref = OKProdTitre(self.data.get('proref'))
         self.main_layout.addWidget(self.lb_proref)
         self.layout = QVBoxLayout()
         self.main_layout.addLayout(self.layout)
         self.main_layout.addStretch()
+    
+    def toolTip(self) -> str:
+        return f"""<h2>{self.data.get('proref')}</h2>
+            <p><b>Qté par kanban (plein) :</b> {self.data.get('qte_kanban_plein')}</p>
+            <p><b>Nb de kanban maximum :</b> {self.data.get('nb_max')}</p>
+            <p><b>Nb de kanban minimum (alerte) :</b> {self.data.get('nb_alerte')}</p>"""
 
     def load(self):
         '''Load or update
@@ -163,3 +169,10 @@ class OKProd(OKbase)        :
             self.layout.itemAt(i).widget().alert = (i >= seuil_alerte)
             #Zone d'alerte stock trop haut
             self.layout.itemAt(i).widget().alert_haut = (i >= self.data.get('nb_max',0))
+        self.setToolTip(self.toolTip())
+
+
+class OKProdTitre(QLabel):
+    '''Un titre de colonne contenant 1 produit
+    '''
+    pass

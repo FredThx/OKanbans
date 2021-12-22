@@ -21,8 +21,18 @@ EmptyOKanban[alert="true"]{
 OKProd {
     border : 2px solid rgb(130, 153, 88);
     border-radius: 5px;
+    background-color: rgb(220, 220, 220);
 }
 
-OKProd::lb_proref{
+OKProdTitre{
     font-weight: bold;
+    border-radius: 2px;
+    background-color: rgb(200, 200, 200);
+    padding: 2px;
+    qproperty-alignment: AlignCenter;
+}
+
+OKTitre{
+    qproperty-alignment: AlignCenter;
+    padding : 0px;
 }

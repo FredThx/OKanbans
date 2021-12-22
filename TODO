@@ -1,10 +1,2 @@
-* Ameliorer l'affichage tableau
-    * ajout ascensseurs H+V
-    * ajout taille mini kanbans
-    * par référence :
-        * si trop de kanbans : sur 2 colones
-    * les petites références : les mettres les unes sur les autres
-    * pouvoir modifier l'ordre des références
 * gérer la connexion/déconnexion à la base
     * mettre en thread
-* Tooltip pour kanbans : historique

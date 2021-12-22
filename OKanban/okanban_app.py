@@ -53,8 +53,6 @@ class OKanbanApp(QMainWindow):
         '''Création des composants graphiques
         '''
         self.setGeometry(50, 50, 800,800)#480, 320) #default size
-        if self.fullscreen:
-            self.showFullScreen()
         #Status barre
         self.statusBar()
         #Menu
@@ -123,6 +121,13 @@ class OKanbanApp(QMainWindow):
         for w in self.widgets:
             w.load()
         self.set_style()
+        isFullScreen = self.isFullScreen()
+        isMaximized = self.isMaximized()
+        self.showNormal() #Un peu con, mais ça fonctionne TODO: améliorer
+        if self.fullscreen or isFullScreen:
+            self.showFullScreen()
+        if isMaximized:
+            self.showMaximized()
 
     def set_style(self, style = None):
         '''Applique le style 

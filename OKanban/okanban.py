@@ -24,6 +24,7 @@ class OKanban(QFrame):
         self.bdd = None
         self._qte = 0
         self._proref = None
+        self.data = None
         self.initUI()
         self.id = id
         self._alert = False
@@ -38,7 +39,7 @@ class OKanban(QFrame):
     @qte.setter
     def qte(self, value):
         self._qte = value
-        self.label_qte.setText(str(self._qte))
+        self.label.setText(str(self._qte))
         self.valueChanged.emit(value)
 
     @property
@@ -47,7 +48,6 @@ class OKanban(QFrame):
     @proref.setter
     def proref(self, value):
         self._proref = value
-        self.label_proref.setText(self._proref)
 
     @property
     def id(self):
@@ -55,19 +55,13 @@ class OKanban(QFrame):
     @id.setter
     def id(self, value):
         self._id = value
-        self.setToolTip(f"id:{self._id or 'vide'}")
 
     def initUI(self):
         layout = QHBoxLayout(self)
-        #self.label_id = QLabel()
-        #self.label_id.setFont(self.font)
-        #layout.addWidget(self.label_id)
-        self.label_qte = QLabel()
-        self.label_qte.setFont(self.font)
-        layout.addWidget(self.label_qte)
-        self.label_proref = QLabel()
-        self.label_proref.setFont(self.font)
-        layout.addWidget(self.label_proref)
+        self.label = OKTitre()
+        self.label.setFont(self.font) #TODO : mettre dans css
+        layout.addWidget(self.label)
+
         #self.setFixedSize(80,60)
 
     def connect(self):
@@ -83,6 +77,7 @@ class OKanban(QFrame):
         self.data = self.bdd.get_kanbans(self.id)[0]
         self.qte = self.data.get('qte')
         self.proref = self.data.get('proref')
+        self.setToolTip(self.toolTip())
     
     @pyqtProperty(bool)
     def alert(self):
@@ -100,14 +95,21 @@ class OKanban(QFrame):
     def alert_haut(self, value):
         self._alert_haut = value
 
+    def toolTip(self) -> str:
+        return f"""
+            <h2>Id:{self._id or 'vide'}</h2>
+            <p><b>Ref :</b> {self._proref}</p>
+            <p><b>Qté :</b> {self._qte}</p>
+            <p><b>Création :</b> {self.data.get('date_creation'):%d/%m/%Y %H:%M}</p>"""
+
 class EmptyOKanban(OKanban):
     '''Un kanban vide
     '''
     def __init__(self, proref, parent = None):
         super().__init__(None)
-        self.proref = ""#proref
-        self.qte = ""#0
-        self.id = 0
+        self._proref = ""#proref
+        self._qte = ""#0
+        self._id = 0
         
     def __str__(self):
         return "EmptyOKanban"
@@ -115,4 +117,8 @@ class EmptyOKanban(OKanban):
     def load(self):
         if self.bdd is None:
             self.connect()    
-    
+
+class OKTitre(QLabel):
+    '''Text dans le okanban
+    '''
+    pass
