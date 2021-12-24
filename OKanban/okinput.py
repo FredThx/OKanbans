@@ -14,11 +14,12 @@ class OKES(QWidget):
     '''
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.app = parent
         self.bdd = None
         self.initUI()
-    
+
     def initUI(self):
-        self.font = QFont('Ubuntu', 36)
+        self.font = QFont('Ubuntu', 36) #TODO : mettre dans css
         self.layout = QGridLayout()
         #self.setStyleSheet(self.style_sheet)
         self.layout.setVerticalSpacing(20)
@@ -30,7 +31,7 @@ class OKES(QWidget):
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
     load = connect
-        
+
 class OKInput(OKES):
     '''Une zone de saisie d'entree en stock
     '''
@@ -39,11 +40,11 @@ class OKInput(OKES):
     def __init__(self, parent = None):
         self.title = "Zone d'entrée"
         super().__init__(parent)
-    
+
     def connect(self):
         super().connect()
         self.update()
-    
+
     def update(self):
         '''Update the comboBox
         '''
@@ -79,23 +80,24 @@ class OKInput(OKES):
         bt.setFont(self.font)
         bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
-    
+
     def on_bt_clicked(self):
         '''Création kanban selon champs complétés
         '''
         proref = self.edit_reference.text()
         qte = int(self.edit_qty.text())
         try:
-            self.bdd.set_kanban(proref=proref, qte=qte)
+            id = self.bdd.set_kanban(proref=proref, qte=qte)
+            self.app.print(id, proref, qte)
         except AssertionError as e:
             logging.warning(e)
             #TODO : fenetre UI
         else:
             self.edit_reference.setText("")
             self.edit_qty.setText("")
-    
+
     def on_edit_reference_change(self, text = ''):
-        '''Quand le text est modifié : 
+        '''Quand le text est modifié :
             changement de couleur si ref ok
             initialisation de la qté
         '''
@@ -108,7 +110,7 @@ class OKInput(OKES):
         else:
             style = "background-color: red;"
         self.edit_reference.setStyleSheet(style)
-    
+
 
 class OKOutput(OKES):
     '''Une zone de saisie de Sortie
@@ -169,7 +171,7 @@ class OKOutput(OKES):
             self.edit_qty.setText("")
 
     def on_edit_kanban_change(self, text = ''):
-        '''Quand le text est modifié : 
+        '''Quand le text est modifié :
             changement de couleur si n° de kanban ok
             initialisation de la qté
         '''

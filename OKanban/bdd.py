@@ -49,10 +49,10 @@ class BddOKanbans(object):
         '''
         self.cache_references = None
         self.cache_kanbans = None
-        
+
     def get_collection(self, table):
         return self.bdd.get_collection(table, codec_options=self.codec_options)
-    
+
     def get_list(self, cursor):
         '''Execute the query and return a list of results
         '''
@@ -102,7 +102,7 @@ class BddOKanbans(object):
             return [ref for ref in self.cache_references if ref.get('proref')==proref]
         else:
             return self.cache_references
-    
+
     def get_params(self, param=None):
         '''Get [one] or all params
         '''
@@ -111,13 +111,13 @@ class BddOKanbans(object):
         else:
             filter = {}
         return self.get_list(self.params.find(filter))
-    
+
     def set_params(self,param, value):
         '''Save param / value on bdd
         '''
         filter = {'param' : param}
         if self.get_params(param):
-            self.params.update_many(filter, {'$set': {'value' : value}})    
+            self.params.update_many(filter, {'$set': {'value' : value}})
         else:
             self.params.insert_one({'param': self.param_last_id, 'value' : value})
 
@@ -157,7 +157,7 @@ class BddOKanbans(object):
             if date_creation is None:
                 date_creation = datetime.datetime.now()
             kanban['date_creation'] = date_creation
-            self.kanbans.insert_one(kanban)            
+            self.kanbans.insert_one(kanban)
         else:
             kanban = self.get_list(self.kanbans.find({'id' : id}))
             assert len(kanban)>0, "unknow id"
@@ -174,7 +174,8 @@ class BddOKanbans(object):
             #TODO : ajouter historique
         self.cache_kanbans = None
         self.send_message_new(kanban['id'])
-    
+        return kanban['id']
+        
     def get_kanbans(self, id=None, proref = None, all = False):
         '''Renvoie la liste des kanbans (limité à 1 éventuellement ou proref)
         (avec systeme cache)
@@ -194,7 +195,7 @@ class BddOKanbans(object):
                 return [k for k in self.cache_kanbans if k.get('proref')==proref]
             else:
                 return self.cache_kanbans
-    
+
     def send_message_new(self, id):
         '''Envoie à toutes les instances de l'application la notification qu'un kanban a été créé
         '''
@@ -202,7 +203,7 @@ class BddOKanbans(object):
             news = instance['news'] + [id]
             self.instances.update_one({'id' : instance['id']},{'$set' : {'news' : news}})
             logging.debug(f"Add new for instance {instance['id']} : {id}. news = {news}")
-    
+
     def send_message_drop(self, id):
         '''Envoie à toutes les instances de l'application la notification qu'un kanban a été supprimé
         '''
@@ -214,7 +215,7 @@ class BddOKanbans(object):
         '''Renvoie un cursor des instances de l'application actives
         '''
         return self.instances.find()
-    
+
     def create_new_instance(self):
         '''Create a new instance de l'application
         and return the new id
@@ -223,7 +224,7 @@ class BddOKanbans(object):
         self.instances.insert_one({'id': id, 'news' :[], 'drops' : []})
         logging.info(f"New instance in bdd : id={id}")
         return id
-    
+
     def delete_instance(self, id):
         '''Delete the instance
         '''
@@ -237,7 +238,7 @@ class BddOKanbans(object):
         instance = self.instances.find_one({'id' : id})
         if instance:
             news, drops = instance.get('news'), instance.get('drops')
-            self.instances.update_one({'id' : instance['id']},{'$set': {'news' : [], 'drops' : []}})            
+            self.instances.update_one({'id' : instance['id']},{'$set': {'news' : [], 'drops' : []}})
             return news, drops
 
     def clean_instances(self, my_id=None, timeout = 10):

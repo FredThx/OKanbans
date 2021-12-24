@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import logging, time
+import logging, time, datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea
 #from PyQt5.QtGui import x
@@ -11,11 +11,19 @@ from .okinput import OKInput, OKOutput
 from .okparams import OKGenParams, OKReferences
 from .bdd import BddOKanbans
 
-
 class OKanbanApp(QMainWindow):
     '''Une application pour Kanbans
     '''
-    def __init__(self, parent=None, title = "OKanbans", fullscreen = False, mode = 'tab', host = None, port = None, style = None):
+    def __init__(self, parent=None, title = "OKanbans", fullscreen = False, mode = 'tab', host = None, port = None, style = None, printer = None, printer_name = None, etiquette = None):
+        '''
+            - fullscreen        :    False or True
+            - mode              :    'tab' or 'input' or 'output'
+            - host              :    database host
+            - port              :    database ip port
+            - style             :   css file name
+            - printer           :   Nicelabel printer
+            - printer_name      :   path of the printer (ex : '\\\\SERVEUR\\imprimante')
+        '''
         super().__init__(parent)
         self.fullscreen = fullscreen
         self.setWindowTitle(title)
@@ -24,6 +32,9 @@ class OKanbanApp(QMainWindow):
         self.host = host
         self.port = port
         self.style = style
+        self.printer = printer
+        self.printer_name = printer_name
+        self.etiquette = etiquette
         self.bdd = BddOKanbans(host, port)
         self.id = None
         self.on_start()
@@ -92,7 +103,7 @@ class OKanbanApp(QMainWindow):
         self.central_widget.addWidget(self.tab)
         self.widgets.append(self.tab)
         ##Input
-        self.input = OKInput()
+        self.input = OKInput(self)
         self.central_widget.addWidget(self.input)
         self.widgets.append(self.input)
         ##Output
@@ -130,7 +141,7 @@ class OKanbanApp(QMainWindow):
             self.showMaximized()
 
     def set_style(self, style = None):
-        '''Applique le style 
+        '''Applique le style
         '''
         style = style or self.style
         if style:
@@ -146,7 +157,7 @@ class OKanbanApp(QMainWindow):
         '''
         if mode:
             self.mode = mode
-        logging.debug(f"Change mode : {self.mode}")            
+        logging.debug(f"Change mode : {self.mode}")
         self.central_widget.setCurrentIndex(['tab','input','output', 'params'].index(self.mode))
         self.mode_tabAction.setChecked(self.mode == 'tab')
         self.mode_inputAction.setChecked(self.mode == 'input')
@@ -163,7 +174,7 @@ class OKanbanApp(QMainWindow):
         if state:
             self.mode = 'input'
         self.update_mode()
-            
+
     def toogle_mode_output(self, state=True):
         if state:
             self.mode = 'output'
@@ -183,6 +194,23 @@ class OKanbanApp(QMainWindow):
             self.bdd.cache_clear()
             self.load()
         self.set_style()
+
+    def print(self, id, proref, qte, date_creation = None):
+        '''Imprime une étiquette kanban
+        '''
+        if self.printer and self.printer_name and self.etiquette:
+            if date_creation is None:
+                date_creation = datetime.date.today()
+            if isinstance(date_creation, datetime.date):
+                date_creation = date_creation.strftime("%d/%m/%Y")
+            datas = {'id':id, 'proref':proref, 'qte' : qte, 'date_creation':date_creation}
+            datas['printer'] = self.printer_name
+            datas['qty'] = 1
+            datas['etiquette'] = self.etiquette
+            logging.debug(f"nicelabel.print({datas})")
+            self.printer.print(**datas)
+        else:
+            logging.warning("Paramètres d'impression non ou mal définis")
 
 class OKanbanWorker(QObject):
     '''Un objet pour executer du code en //
@@ -205,7 +233,3 @@ class OKanbanWorker(QObject):
 if __name__ == '__main__':
     app = QApplication([])
     fenetre = OKanbanApp(app)
-
-
-
-
