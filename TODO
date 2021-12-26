@@ -2,8 +2,4 @@
     * mettre en thread
 * mode sans clavier
   * mettre clavier numérique visuel
-  * remplir la QComboBox avec les références
 * revoir paramètres (bug en création de paramètre)
-*Nicelabel :
-  printer=HttpNiceLabel('http://192.168.0.6:56425')
-  printer.print({'etiquette': 'ET_PER_1', 'proref': '7TDSIEGE', 'qty': 1, 'qte': 100, 'printer': '\\\\SRV-DATA\\ZEBRA PERCAGE', 'date_creation': '24/12/2021'})

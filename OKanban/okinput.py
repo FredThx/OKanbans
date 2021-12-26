@@ -30,7 +30,10 @@ class OKES(QWidget):
         '''Connecte the database'''
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
-    load = connect
+
+
+    def load(self):
+        self.connect()
 
 class OKInput(OKES):
     '''Une zone de saisie d'entree en stock
