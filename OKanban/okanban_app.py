@@ -4,7 +4,7 @@ import logging, time, datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea
 #from PyQt5.QtGui import x
-from PyQt5.QtCore import QTimer, QThread, QObject
+from PyQt5.QtCore import QTimer, QThread, QObject, Qt
 
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
@@ -28,6 +28,11 @@ class OKanbanApp(QMainWindow):
         self.fullscreen = fullscreen
         self.setWindowTitle(title)
         #self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setWindowFlags(
+            Qt.WindowCloseButtonHint | 
+            Qt.WindowMinimizeButtonHint |
+            Qt.WindowMaximizeButtonHint
+        )
         self.mode = mode
         self.host = host
         self.port = port

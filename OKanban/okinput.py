@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
+from .number_pad import numberPopup
 
 class OKES(QWidget):
     '''Tableau des kanbans
