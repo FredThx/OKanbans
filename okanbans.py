@@ -26,5 +26,6 @@ args.printer = HttpNiceLabel('http://192.168.0.6:56425')
 app = QApplication([])
 logging.info(f"Open okanbans with args : {vars(args)}")
 kanbans = OKanbanApp(**(vars(args)))
+kanbans.show()
 if __name__ == '__main__':
     sys.exit(app.exec_())

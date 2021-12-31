@@ -3,10 +3,10 @@
 import sys
 
 from PyQt5.QtWidgets import QLayout, QWidget,  QHBoxLayout, QLineEdit, QPushButton, QApplication
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtGui import QIntValidator, QFont
 from PyQt5.QtCore import pyqtSignal
 
-from number_pad import numberPopup
+from .number_pad import numberPopup
 
 class NumberEntry(QWidget):
     '''Un widget de saisie de numérique avec clavier visuel
@@ -26,8 +26,8 @@ class NumberEntry(QWidget):
         self.edit_line.returnPressed.connect(self.on_validate)
         self.layout.addWidget(self.edit_line)
         self.button = QPushButton("...")
+        self.button.setFixedWidth(25)#TODO : récupérer la taille de la font
         self.button.clicked.connect(self.open_number_pad)
-        self.button.adjustSize()
         self.layout.addWidget(self.button)
         self.setLayout(self.layout)
 
@@ -46,6 +46,13 @@ class NumberEntry(QWidget):
         '''When entre is pressed or keypad button pressed
         '''
         self.returnPressed.emit()
+    
+    def setFont(self, a0:QFont) -> None:
+        self.edit_line.setFont(a0)
+        self.button.setFont(a0)
+    
+    def setText(self, text) -> None:
+        return self.edit_line.setText(text)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

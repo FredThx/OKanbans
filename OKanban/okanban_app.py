@@ -4,7 +4,7 @@ import logging, time, datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea
 #from PyQt5.QtGui import x
-from PyQt5.QtCore import QTimer, QThread, QObject, Qt
+from PyQt5.QtCore import QTimer, QThread, QObject, Qt, QRect, QPoint
 
 from .oktab import OKTab
 from .okinput import OKInput, OKOutput
@@ -68,7 +68,13 @@ class OKanbanApp(QMainWindow):
     def initUI(self):
         '''Création des composants graphiques
         '''
-        self.setGeometry(50, 50, 800,800)#480, 320) #default size
+        screen = QApplication.primaryScreen()
+        rect = QRect(
+                QPoint(
+                    (screen.size()/10).width(),
+                    (screen.size()/10).height())
+                , screen.size()*0.7)
+        self.setGeometry(rect)
         #Status barre
         self.statusBar()
         #Menu

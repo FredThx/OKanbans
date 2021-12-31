@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
-from .number_pad import numberPopup
+from .number_entry import NumberEntry
 
 class OKES(QWidget):
     '''Tableau des kanbans
@@ -74,9 +74,8 @@ class OKInput(OKES):
         label_qty = QLabel("Quantité :")
         label_qty.setFont(self.font)
         self.layout.addWidget(label_qty, 1,0)
-        self.edit_qty = QLineEdit()
+        self.edit_qty = NumberEntry()
         self.edit_qty.setFont(self.font)
-        self.edit_qty.setValidator(QIntValidator())
         self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
