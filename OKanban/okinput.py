@@ -22,10 +22,15 @@ class OKES(QWidget):
     def initUI(self):
         self.font = QFont('Ubuntu', 36) #TODO : mettre dans css
         self.layout = QGridLayout()
-        #self.setStyleSheet(self.style_sheet)
         self.layout.setVerticalSpacing(20)
         self.layout.setHorizontalSpacing(20)
         self.setLayout(self.layout)
+    
+    def stretch(self):
+        '''Add stretch bottom and right
+        '''
+        self.layout.setRowStretch(self.layout.rowCount(),1)
+        self.layout.setColumnStretch(self.layout.columnCount(),1)
 
     def connect(self):
         '''Connecte the database'''
@@ -83,6 +88,8 @@ class OKInput(OKES):
         bt.setFont(self.font)
         bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
+        #
+        self.stretch()
 
     def on_bt_clicked(self):
         '''Création kanban selon champs complétés
@@ -155,7 +162,8 @@ class OKOutput(OKES):
         bt.setFont(self.font)
         bt.clicked.connect(self.on_bt_clicked)
         self.layout.addWidget(bt,2,1)
-
+        #
+        self.stretch()
 
 
     def on_bt_clicked(self):
