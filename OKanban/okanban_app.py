@@ -43,10 +43,10 @@ class OKanbanApp(QMainWindow):
         self.bdd = BddOKanbans(host, port)
         self.id = None
         self.on_start()
-        self.widgets = []
+        self.widgets = {}
         self.initUI()
-        self.show()
-        self.load()
+        #self.show()
+        #self.load()
         self.timer = QTimer()
         self.timer.timeout.connect(self.on_timer)
         self.timer.start(1000)
@@ -107,36 +107,37 @@ class OKanbanApp(QMainWindow):
         self.mode_parametres.triggered.connect(self.toogle_mode_params)
         modeMenu.addAction(self.mode_parametres)
         #Central Widget
-        self.central_widget = QStackedWidget()
-        self.setCentralWidget(self.central_widget)
+        #self.central_widget = QStackedWidget()
+        #self.setCentralWidget(self.central_widget)
         ##tab
-        self.tab = OKTab()
-        self.central_widget.addWidget(self.tab)
-        self.widgets.append(self.tab)
+        #self.tab = OKTab()
+        #self.central_widget.addWidget(self.tab)
+        #self.widgets['tab']=self.tab
         ##Input
-        self.input = OKInput(self)
-        self.central_widget.addWidget(self.input)
-        self.widgets.append(self.input)
+        #self.input = OKInput(self)
+        #self.central_widget.addWidget(self.input)
+        #self.widgets['input']=self.input
         ##Output
-        self.output = OKOutput()
-        self.central_widget.addWidget(self.output)
-        self.widgets.append(self.output)
+        #self.output = OKOutput()
+        #self.central_widget.addWidget(self.output)
+        #self.widgets['output']=self.output
         ##Params
-        params_widget = QWidget()
-        params_layout = QVBoxLayout(params_widget)
-        self.central_widget.addWidget(params_widget)
+        #params_widget = QWidget()
+        #params_layout = QVBoxLayout(params_widget)
+        #self.widgets['params']=params_widget
+        #self.central_widget.addWidget(params_widget)
         ###Genparams
-        self.params = OKGenParams()
-        params_layout.addWidget(self.params)
-        self.widgets.append(self.params)
+        #self.params = OKGenParams()
+        #params_layout.addWidget(self.params)
+        #self.widgets.append(self.params)
         ###Refsparams
-        self.references = OKReferences()
-        params_layout.addWidget(self.references)
-        self.widgets.append(self.references)
+        #self.references = OKReferences()
+        #params_layout.addWidget(self.references)
+        #self.widgets.append(self.references)
         self.update_mode()
 
-    def load(self):
-        '''Load all widgets with data
+    def load_all(self):
+        '''Load all widgets with data OBSOLETTE
         '''
         if self.id is None:
             self.id = self.bdd.create_new_instance()
@@ -150,6 +151,24 @@ class OKanbanApp(QMainWindow):
             self.showFullScreen()
         if isMaximized:
             self.showMaximized()
+    
+    def load(self):
+        '''Load the active view
+        '''
+        if self.mode == 'params':
+            self.params.load()
+            self.references.load()
+        else:
+            self.main_widget.load()
+        self.set_style()
+        isFullScreen = self.isFullScreen()
+        isMaximized = self.isMaximized()
+        self.showNormal() #Un peu con, mais ça fonctionne TODO: améliorer
+        if self.fullscreen or isFullScreen:
+            self.showFullScreen()
+        if isMaximized:
+            self.showMaximized()
+
 
     def set_style(self, style = None):
         '''Applique le style
@@ -169,12 +188,28 @@ class OKanbanApp(QMainWindow):
         if mode:
             self.mode = mode
         logging.debug(f"Change mode : {self.mode}")
-        self.central_widget.setCurrentIndex(['tab','input','output', 'params'].index(self.mode))
+        #self.central_widget.setCurrentIndex(['tab','input','output', 'params'].index(self.mode))
         self.mode_tabAction.setChecked(self.mode == 'tab')
         self.mode_inputAction.setChecked(self.mode == 'input')
         self.mode_outputAction.setChecked(self.mode == 'output')
         self.mode_parametres.setChecked(self.mode == 'params')
-
+        if self.mode == 'tab':
+            self.main_widget = OKTab()
+        elif self.mode == 'input':
+            self.main_widget = OKInput(self)
+        elif self.mode == 'output':
+            self.main_widget = OKOutput(self)
+        elif self.mode == 'params':
+            self.main_widget = QWidget()
+            params_layout = QVBoxLayout(self.main_widget)
+            ###Genparams
+            self.params = OKGenParams()
+            params_layout.addWidget(self.params)
+            ###Refsparams
+            self.references = OKReferences()
+            params_layout.addWidget(self.references)
+        self.setCentralWidget(self.main_widget)
+        self.load()
 
     def toogle_mode_tab(self, state=True):
         if state:
@@ -199,12 +234,13 @@ class OKanbanApp(QMainWindow):
     def on_timer(self):
         '''Vérifie s'il y a des modification dans la bdd
         '''
-        news, drops = self.bdd.get_messages(self.id)
-        if news or drops:
-            logging.info(f"New data on bdd : {news}, {drops}")
-            self.bdd.cache_clear()
-            self.load()
-        self.set_style()
+        if self.id:
+            news, drops = self.bdd.get_messages(self.id)
+            if news or drops:
+                logging.info(f"New data on bdd : {news}, {drops}")
+                self.bdd.cache_clear()
+                self.load()
+            self.set_style()
 
     def print(self, id, proref, qte, date_creation = None):
         '''Imprime une étiquette kanban
