@@ -90,6 +90,7 @@ class OKInput(OKES):
         self.layout.addWidget(bt,2,1)
         #
         self.stretch()
+        self.edit_reference.setFocus()
 
     def on_bt_clicked(self):
         '''Création kanban selon champs complétés
@@ -164,6 +165,7 @@ class OKOutput(OKES):
         self.layout.addWidget(bt,2,1)
         #
         self.stretch()
+        self.edit_kanban.setFocus()
 
 
     def on_bt_clicked(self):

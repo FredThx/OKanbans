@@ -36,6 +36,9 @@ class NumberEntry(QWidget):
     def text(self):
         return self.edit_line.text()
 
+    def setFocus(self):
+        self.edit_line.setFocus()
+
     def open_number_pad(self):
         '''Open the keypad
         '''
