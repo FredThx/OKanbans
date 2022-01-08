@@ -1,6 +1,8 @@
 # coding: utf-8
 
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QTranslator
+
 from OKanban.okanban_app import OKanbanApp
 from OKanban.nicelabel import HttpNiceLabel
 import time, sys
@@ -24,6 +26,9 @@ args = parser.parse_args()
 args.printer = HttpNiceLabel('http://192.168.0.6:56425')
 
 app = QApplication([])
+translator = QTranslator()
+app.installTranslator(translator)
+
 logging.info(f"Open okanbans with args : {vars(args)}")
 kanbans = OKanbanApp(**(vars(args)))
 kanbans.show()

@@ -12,6 +12,7 @@ class NumberEntry(QWidget):
     '''Un widget de saisie de numérique avec clavier visuel
     '''
     returnPressed = pyqtSignal()
+    textChanged = pyqtSignal(str)
 
     def __init__(self, parent = None, title = "Number", geometry = (130,320,400,300)):
         super().__init__(parent)
@@ -24,9 +25,10 @@ class NumberEntry(QWidget):
         self.edit_line = QLineEdit()
         self.edit_line.setValidator(QIntValidator())
         self.edit_line.returnPressed.connect(self.on_validate)
+        self.edit_line.textChanged.connect(self.on_textChanged)
         self.layout.addWidget(self.edit_line)
         self.button = QPushButton("...")
-        self.button.setFixedWidth(25)#TODO : récupérer la taille de la font
+        self.button.setFixedWidth(50)#TODO : récupérer la taille de la font
         self.button.clicked.connect(self.open_number_pad)
         self.layout.addWidget(self.button)
         self.setLayout(self.layout)
@@ -45,7 +47,11 @@ class NumberEntry(QWidget):
     def on_validate(self):
         '''When entre is pressed or keypad button pressed
         '''
+        self.textChanged.emit(self.edit_line.text())
         self.returnPressed.emit()
+    
+    def on_textChanged(self):
+        self.textChanged.emit(self.edit_line.text())
     
     def setFont(self, a0:QFont) -> None:
         self.edit_line.setFont(a0)

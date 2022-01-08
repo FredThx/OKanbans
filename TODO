@@ -1,6 +1,4 @@
 * gérer la connexion/déconnexion à la base
     * mettre en thread
-* mode sans clavier
-  * mettre clavier numérique visuel
 * revoir paramètres (bug en création de paramètre)
 * ajouter option pour ré-imprimer à partir du tableau
