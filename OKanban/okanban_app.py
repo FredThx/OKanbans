@@ -43,10 +43,7 @@ class OKanbanApp(QMainWindow):
         self.bdd = BddOKanbans(host, port)
         self.id = None
         self.on_start()
-        self.widgets = {}
         self.initUI()
-        #self.show()
-        #self.load()
         self.timer = QTimer()
         self.timer.timeout.connect(self.on_timer)
         self.timer.start(1000)
@@ -107,51 +104,8 @@ class OKanbanApp(QMainWindow):
         self.mode_parametres.triggered.connect(self.toogle_mode_params)
         modeMenu.addAction(self.mode_parametres)
         #Central Widget
-        #self.central_widget = QStackedWidget()
-        #self.setCentralWidget(self.central_widget)
-        ##tab
-        #self.tab = OKTab()
-        #self.central_widget.addWidget(self.tab)
-        #self.widgets['tab']=self.tab
-        ##Input
-        #self.input = OKInput(self)
-        #self.central_widget.addWidget(self.input)
-        #self.widgets['input']=self.input
-        ##Output
-        #self.output = OKOutput()
-        #self.central_widget.addWidget(self.output)
-        #self.widgets['output']=self.output
-        ##Params
-        #params_widget = QWidget()
-        #params_layout = QVBoxLayout(params_widget)
-        #self.widgets['params']=params_widget
-        #self.central_widget.addWidget(params_widget)
-        ###Genparams
-        #self.params = OKGenParams()
-        #params_layout.addWidget(self.params)
-        #self.widgets.append(self.params)
-        ###Refsparams
-        #self.references = OKReferences()
-        #params_layout.addWidget(self.references)
-        #self.widgets.append(self.references)
         self.update_mode()
 
-    def load_all(self):
-        '''Load all widgets with data OBSOLETTE
-        '''
-        if self.id is None:
-            self.id = self.bdd.create_new_instance()
-        for w in self.widgets:
-            w.load()
-        self.set_style()
-        isFullScreen = self.isFullScreen()
-        isMaximized = self.isMaximized()
-        self.showNormal() #Un peu con, mais ça fonctionne TODO: améliorer
-        if self.fullscreen or isFullScreen:
-            self.showFullScreen()
-        if isMaximized:
-            self.showMaximized()
-    
     def load(self):
         '''Load the active view
         '''
@@ -179,8 +133,6 @@ class OKanbanApp(QMainWindow):
                 self.setStyleSheet(open(style).read())
             except FileNotFoundError as e:
                 logging.error(e)
-            #else:
-                #logging.debug(f"Style {style} applied")
 
     def update_mode(self, mode=None):
         ''' Change the mode
@@ -188,7 +140,6 @@ class OKanbanApp(QMainWindow):
         if mode:
             self.mode = mode
         logging.debug(f"Change mode : {self.mode}")
-        #self.central_widget.setCurrentIndex(['tab','input','output', 'params'].index(self.mode))
         self.mode_tabAction.setChecked(self.mode == 'tab')
         self.mode_inputAction.setChecked(self.mode == 'input')
         self.mode_outputAction.setChecked(self.mode == 'output')
