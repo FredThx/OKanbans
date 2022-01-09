@@ -2,8 +2,8 @@
 
 import logging
 
-from PyQt5.QtWidgets import  QFrame, QWidget, QLabel, QHBoxLayout, QVBoxLayout, QPushButton
-from PyQt5.QtCore import Qt, pyqtSignal, pyqtProperty
+from PyQt5.QtWidgets import  QFrame, QLabel, QHBoxLayout
+from PyQt5.QtCore import pyqtSignal, pyqtProperty
 from PyQt5.QtGui import QFont
 
 from .qtutils import Qutil

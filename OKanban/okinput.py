@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
 from .number_entry import NumberEntry
+from .timer_message_box import TimerMessageBox
 
 class OKES(QWidget):
     '''Tableau des kanbans
@@ -100,6 +101,8 @@ class OKInput(OKES):
         try:
             id = self.bdd.set_kanban(proref=proref, qte=qte)
             self.app.print(id, proref, qte)
+            messagebox = TimerMessageBox(f"Création du kanban n°{id} : {qte} {proref}.", 3, self)
+            messagebox.exec_()
         except AssertionError as e:
             logging.warning(e)
             #TODO : fenetre UI
@@ -173,9 +176,16 @@ class OKOutput(OKES):
         '''
         id = int(self.edit_kanban.text())
         qte_a_enlever = int(self.edit_qty.text())
-        qte_kanban = self.bdd.get_kanbans(id=id)[0].get('qte')
+        kanban = self.bdd.get_kanbans(id=id)[0]
+        qte_kanban = kanban.get('qte')
+        proref = kanban.get('proref')
         try:
             self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
+            if qte_kanban - qte_a_enlever>0:
+                messagebox = TimerMessageBox(f"Le kanban n°{id} est partiellement consommé. Il reste {qte_kanban - qte_a_enlever} {proref}", 3, self)    
+            else:
+                messagebox = TimerMessageBox(f"Le kanban n°{id} ({proref}) est consommé.", 3, self)    
+            messagebox.exec_()
         except AssertionError as e:
             logging.warning(e)
             #TODO : status
