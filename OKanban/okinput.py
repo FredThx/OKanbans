@@ -26,7 +26,7 @@ class OKES(QWidget):
         self.layout.setVerticalSpacing(20)
         self.layout.setHorizontalSpacing(20)
         self.setLayout(self.layout)
-    
+
     def stretch(self):
         '''Add stretch bottom and right
         '''
@@ -175,23 +175,28 @@ class OKOutput(OKES):
         '''Consommation du kanban
         '''
         id = int(self.edit_kanban.text())
-        qte_a_enlever = int(self.edit_qty.text())
-        kanban = self.bdd.get_kanbans(id=id)[0]
-        qte_kanban = kanban.get('qte')
-        proref = kanban.get('proref')
         try:
-            self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
-            if qte_kanban - qte_a_enlever>0:
-                messagebox = TimerMessageBox(f"Le kanban n°{id} est partiellement consommé. Il reste {qte_kanban - qte_a_enlever} {proref}", 3, self)    
-            else:
-                messagebox = TimerMessageBox(f"Le kanban n°{id} ({proref}) est consommé.", 3, self)    
-            messagebox.exec_()
-        except AssertionError as e:
-            logging.warning(e)
-            #TODO : status
-        else:
+            kanban = self.bdd.get_kanbans(id=id)[0]
+        except IndexError:
             self.edit_kanban.setText("")
             self.edit_qty.setText("")
+        else:
+            qte_a_enlever = int(self.edit_qty.text())
+            qte_kanban = kanban.get('qte')
+            proref = kanban.get('proref')
+            try:
+                self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
+                if qte_kanban - qte_a_enlever>0:
+                    messagebox = TimerMessageBox(f"Le kanban n°{id} est partiellement consommé. Il reste {qte_kanban - qte_a_enlever} {proref}", 3, self)
+                else:
+                    messagebox = TimerMessageBox(f"Le kanban n°{id} ({proref}) est consommé.", 3, self)
+                messagebox.exec_()
+            except AssertionError as e:
+                logging.warning(e)
+                #TODO : status
+            else:
+                self.edit_kanban.setText("")
+                self.edit_qty.setText("")
 
     def on_edit_kanban_change(self, text = ''):
         '''Quand le text est modifié :
