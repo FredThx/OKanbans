@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import logging
+import logging, time
 
 from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox
 from PyQt5.QtGui import QFont, QIntValidator
@@ -80,7 +80,7 @@ class OKInput(OKES):
         label_qty = QLabel("Quantité :")
         label_qty.setFont(self.font)
         self.layout.addWidget(label_qty, 1,0)
-        self.edit_qty = NumberEntry()
+        self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
         self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
@@ -141,7 +141,7 @@ class OKOutput(OKES):
         self.label_id = QLabel("N° de kanban :")
         self.label_id.setFont(self.font)
         self.layout.addWidget(self.label_id, 0,0)
-        self.edit_kanban = NumberEntry()
+        self.edit_kanban = NumberEntry(geometry = (50,50,400,300))
         self.edit_kanban.setFont(self.font)
         #self.edit_kanban.setValidator(QIntValidator())
         self.edit_kanban.textChanged.connect(self.on_edit_kanban_change)
@@ -151,9 +151,8 @@ class OKOutput(OKES):
         label_qty = QLabel("Quantité à enlever:")
         label_qty.setFont(self.font)
         self.layout.addWidget(label_qty, 1,0)
-        self.edit_qty = QLineEdit()
+        self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
-        self.edit_qty.setValidator(QIntValidator())
         self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 4 : Boutons et proref
@@ -174,12 +173,15 @@ class OKOutput(OKES):
     def on_bt_clicked(self):
         '''Consommation du kanban
         '''
-        id = int(self.edit_kanban.text())
         try:
+            id = int(self.edit_kanban.text())
             kanban = self.bdd.get_kanbans(id=id)[0]
         except IndexError:
+            time.sleep(2)
             self.edit_kanban.setText("")
             self.edit_qty.setText("")
+        except ValueError:
+            pass
         else:
             qte_a_enlever = int(self.edit_qty.text())
             qte_kanban = kanban.get('qte')

@@ -52,21 +52,21 @@ class NumberEntry(QWidget):
         '''
         self.textChanged.emit(self.edit_line.text())
         self.returnPressed.emit()
-    
+
     def on_textChanged(self):
         self.textChanged.emit(self.edit_line.text())
-    
+
     def setFont(self, a0:QFont) -> None:
         self.edit_line.setFont(a0)
         self.button.setFont(a0)
-    
+
     def setText(self, text) -> None:
         return self.edit_line.setText(text)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = QWidget()
-    layout = QHBoxLayout()  
+    layout = QHBoxLayout()
     number_entry = NumberEntry()
     def show():
         print(number_entry.text())
