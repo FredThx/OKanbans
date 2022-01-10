@@ -1,0 +1,15 @@
+[Unit]
+Description= Application OKanbans OLFA
+After=network.target graphical.target
+Wants=graphical.target
+
+[Service]
+ExecStart=sudo /usr/bin/python /home/pi/commun/ApplicationsOLFA/OKanbans/okanbans.py --mode tab --fullscreen
+KillMode=process
+TimeoutSec=infinity
+User=pi
+group=pi
+RemainAfterExit=no
+
+[Install]
+WantedBy=graphical.target
