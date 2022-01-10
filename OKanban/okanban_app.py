@@ -1,8 +1,8 @@
 # coding: utf-8
 
-import logging, time, datetime
+import logging, time, datetime, os
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea, QMessageBox
 #from PyQt5.QtGui import x
 from PyQt5.QtCore import QTimer, QThread, QObject, Qt, QRect, QPoint
 
@@ -29,7 +29,7 @@ class OKanbanApp(QMainWindow):
         self.setWindowTitle(title)
         #self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowFlags(
-            Qt.WindowCloseButtonHint | 
+            Qt.WindowCloseButtonHint |
             Qt.WindowMinimizeButtonHint |
             Qt.WindowMaximizeButtonHint
         )
@@ -82,6 +82,11 @@ class OKanbanApp(QMainWindow):
         exitAction.setStatusTip("Ferme l'application")
         exitAction.triggered.connect(qApp.quit)
         fileMenu.addAction(exitAction)
+        haltAction = QAction("&Eteindre", self)
+        haltAction.setShortcut('CTRl+E')
+        exitAction.setStatusTip("Eteindre")
+        haltAction.triggered.connect(self.halt)
+        fileMenu.addAction(haltAction)
         modeMenu = menubar.addMenu('&Mode')
         self.mode_tabAction = QAction('Mode &Tableau', self, checkable = True)
         self.mode_tabAction.setShortcut('Ctrl+T')
@@ -209,6 +214,17 @@ class OKanbanApp(QMainWindow):
             self.printer.print(**datas)
         else:
             logging.warning("Paramètres d'impression non ou mal définis")
+
+    def halt(self):
+        '''halt the system
+        '''
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Warning)
+        msg.setText("Voulez vous vraiment éteindre le system?")
+        msg.setWindowTitle("Eteindre le système.")
+        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        if msg.exec_() == QMessageBox.Ok:
+            os.system("sudo halt")
 
 class OKanbanWorker(QObject):
     '''Un objet pour executer du code en //
