@@ -41,7 +41,7 @@ class OKanbanApp(QMainWindow):
         self.printer_name = printer_name
         self.etiquette = etiquette
         self.bdd = BddOKanbans(host, port)
-        self.id = None
+        self.id = self.bdd.create_new_instance()
         self.on_start()
         self.initUI()
         self.timer = QTimer()

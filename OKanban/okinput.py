@@ -109,6 +109,7 @@ class OKInput(OKES):
         else:
             self.edit_reference.setText("")
             self.edit_qty.setText("")
+            self.edit_reference.setFocus()
 
     def on_edit_reference_change(self, text = ''):
         '''Quand le text est modifié :
@@ -180,6 +181,7 @@ class OKOutput(OKES):
             time.sleep(2)
             self.edit_kanban.setText("")
             self.edit_qty.setText("")
+            self.edit_kanban.setFocus()
         except ValueError:
             pass
         else:
@@ -199,6 +201,7 @@ class OKOutput(OKES):
             else:
                 self.edit_kanban.setText("")
                 self.edit_qty.setText("")
+                self.edit_kanban.setFocus()
 
     def on_edit_kanban_change(self, text = ''):
         '''Quand le text est modifié :
