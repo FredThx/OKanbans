@@ -2,7 +2,7 @@
 
 import logging, time
 
-from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox
+from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox, QHBoxLayout
 from PyQt5.QtGui import QFont, QIntValidator
 from PyQt5.QtCore import Qt
 
@@ -68,6 +68,7 @@ class OKInput(OKES):
         label_ref = QLabel("Référence :")
         label_ref.setFont(self.font)
         self.layout.addWidget(label_ref, 0,0)
+        layout_ref = QHBoxLayout()
         self.combo_ref = QComboBox()
         self.combo_ref.setFont(self.font)
         self.edit_reference = QLineEdit()
@@ -75,7 +76,12 @@ class OKInput(OKES):
         self.edit_reference.textChanged.connect(self.on_edit_reference_change)
         self.edit_reference.returnPressed.connect(self.on_bt_clicked)
         self.combo_ref.setLineEdit(self.edit_reference)
-        self.layout.addWidget(self.combo_ref,0,1)
+        layout_ref.addWidget(self.combo_ref)
+        button_raz = QPushButton("RAZ")
+        button_raz.setFont(self.font)
+        button_raz.clicked.connect(self.raz)
+        layout_ref.addWidget(button_raz)
+        self.layout.addLayout(layout_ref,0,1)
         #Ligne 2 : Qté
         label_qty = QLabel("Quantité :")
         label_qty.setFont(self.font)
@@ -107,9 +113,8 @@ class OKInput(OKES):
             logging.warning(e)
             #TODO : fenetre UI
         else:
-            self.edit_reference.setText("")
-            self.edit_qty.setText("")
-            self.edit_reference.setFocus()
+            self.raz()
+
 
     def on_edit_reference_change(self, text = ''):
         '''Quand le text est modifié :
@@ -125,6 +130,11 @@ class OKInput(OKES):
         else:
             style = "background-color: red;"
         self.edit_reference.setStyleSheet(style)
+
+    def raz(self):
+        self.edit_reference.setText("")
+        self.edit_qty.setText("")
+        self.edit_reference.setFocus()
 
 
 class OKOutput(OKES):
