@@ -74,7 +74,7 @@ class OKInput(OKES):
         self.edit_reference = QLineEdit()
         self.edit_reference.setFont(self.font)
         self.edit_reference.textChanged.connect(self.on_edit_reference_change)
-        self.edit_reference.returnPressed.connect(self.on_bt_clicked)
+        #self.edit_reference.returnPressed.connect(self.on_bt_clicked)
         self.combo_ref.setLineEdit(self.edit_reference)
         layout_ref.addWidget(self.combo_ref)
         button_raz = QPushButton("RAZ")
@@ -88,7 +88,7 @@ class OKInput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
-        self.edit_qty.returnPressed.connect(self.on_bt_clicked)
+        #self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
         bt = QPushButton("Création")
@@ -156,7 +156,7 @@ class OKOutput(OKES):
         self.edit_kanban.setFont(self.font)
         #self.edit_kanban.setValidator(QIntValidator())
         self.edit_kanban.textChanged.connect(self.on_edit_kanban_change)
-        self.edit_kanban.returnPressed.connect(self.on_bt_clicked)
+        #self.edit_kanban.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_kanban,0,1)
         #Ligne 3 : Qté
         label_qty = QLabel("Quantité à enlever:")
@@ -164,7 +164,7 @@ class OKOutput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
-        self.edit_qty.returnPressed.connect(self.on_bt_clicked)
+        #self.edit_qty.returnPressed.connect(self.on_bt_clicked)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 4 : Boutons et proref
         self.label_proref = QLabel()
