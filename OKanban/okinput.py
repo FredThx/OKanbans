@@ -2,7 +2,7 @@
 
 import logging, time
 
-from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox, QHBoxLayout
+from PyQt5.QtWidgets import QWidget, QLabel,  QGridLayout, QLineEdit, QPushButton, QComboBox, QHBoxLayout, QCheckBox, QVBoxLayout
 from PyQt5.QtGui import QFont, QIntValidator
 from PyQt5.QtCore import Qt
 
@@ -18,14 +18,25 @@ class OKES(QWidget):
         super().__init__(parent)
         self.app = parent
         self.bdd = None
+        self.auto = True
         self.initUI()
 
     def initUI(self):
         self.font = QFont('Ubuntu', 36) #TODO : mettre dans css
+        main = QVBoxLayout()
         self.layout = QGridLayout()
         self.layout.setVerticalSpacing(20)
         self.layout.setHorizontalSpacing(20)
-        self.setLayout(self.layout)
+        main.addLayout(self.layout)
+        self.check_auto = QCheckBox("Automatique")
+        self.check_auto.setFont(self.font)
+        self.check_auto.setCheckState(self.auto)
+        self.check_auto.setTristate(False)
+        self.check_auto.stateChanged.connect(self.change_auto)
+        main.addWidget(self.check_auto)
+        main.addStretch()
+        self.setLayout(main)
+
 
     def stretch(self):
         '''Add stretch bottom and right
@@ -38,9 +49,19 @@ class OKES(QWidget):
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
 
-
     def load(self):
         self.connect()
+
+    def change_auto(self, state):
+        if state == Qt.Checked:
+            self.auto = True
+        else:
+            self.auto = False
+    def on_validate(self):
+        if self.auto:
+            self.on_bt_clicked()
+
+
 
 class OKInput(OKES):
     '''Une zone de saisie d'entree en stock
@@ -74,7 +95,7 @@ class OKInput(OKES):
         self.edit_reference = QLineEdit()
         self.edit_reference.setFont(self.font)
         self.edit_reference.textChanged.connect(self.on_edit_reference_change)
-        #self.edit_reference.returnPressed.connect(self.on_bt_clicked)
+        self.edit_reference.returnPressed.connect(self.on_validate)
         self.combo_ref.setLineEdit(self.edit_reference)
         layout_ref.addWidget(self.combo_ref)
         button_raz = QPushButton("RAZ")
@@ -88,7 +109,7 @@ class OKInput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
-        #self.edit_qty.returnPressed.connect(self.on_bt_clicked)
+        self.edit_qty.returnPressed.connect(self.on_validate)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 3 : Boutons
         bt = QPushButton("Création")
@@ -154,9 +175,8 @@ class OKOutput(OKES):
         self.layout.addWidget(self.label_id, 0,0)
         self.edit_kanban = NumberEntry(geometry = (50,50,400,300))
         self.edit_kanban.setFont(self.font)
-        #self.edit_kanban.setValidator(QIntValidator())
         self.edit_kanban.textChanged.connect(self.on_edit_kanban_change)
-        #self.edit_kanban.returnPressed.connect(self.on_bt_clicked)
+        self.edit_kanban.returnPressed.connect(self.on_validate)
         self.layout.addWidget(self.edit_kanban,0,1)
         #Ligne 3 : Qté
         label_qty = QLabel("Quantité à enlever:")
@@ -164,7 +184,7 @@ class OKOutput(OKES):
         self.layout.addWidget(label_qty, 1,0)
         self.edit_qty = NumberEntry(geometry = (50,50,400,300))
         self.edit_qty.setFont(self.font)
-        #self.edit_qty.returnPressed.connect(self.on_bt_clicked)
+        self.edit_qty.returnPressed.connect(self.on_validate)
         self.layout.addWidget(self.edit_qty,1,1)
         #Ligne 4 : Boutons et proref
         self.label_proref = QLabel()
