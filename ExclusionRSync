@@ -4,3 +4,5 @@ __pycache__
 .log
 okanban.log
 okanbans.log
+build
+dist
