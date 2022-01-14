@@ -36,3 +36,8 @@ OKTitre{
     qproperty-alignment: AlignCenter;
     padding : 0px;
 }
+
+QCheckBox::indicator {
+    width: 100px;
+    height: 100px;
+}
