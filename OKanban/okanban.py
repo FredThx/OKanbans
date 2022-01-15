@@ -2,9 +2,9 @@
 
 import logging
 
-from PyQt5.QtWidgets import  QFrame, QLabel, QHBoxLayout
+from PyQt5.QtWidgets import  QFrame, QInputDialog, QLabel, QHBoxLayout, QMenu, QMessageBox
 from PyQt5.QtCore import pyqtSignal, pyqtProperty
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QContextMenuEvent
 
 from .qtutils import Qutil
 import OKanban.okanban_app as OK_app #Evite circular import
@@ -15,6 +15,7 @@ class OKanban(QFrame):
     '''
 
     valueChanged = pyqtSignal(object)
+
 
     def __init__(self, id, parent = None):
         '''id : unique Id of the kanban
@@ -101,6 +102,29 @@ class OKanban(QFrame):
             <p><b>Ref :</b> {self._proref}</p>
             <p><b>Qté :</b> {self._qte}</p>
             <p><b>Création :</b> {self.data.get('date_creation'):%d/%m/%Y %H:%M}</p>"""
+    
+    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
+        context_menu = QMenu(self)
+        kprint = context_menu.addAction('Ré-imprime')
+        kdelete = context_menu.addAction('Supprime')
+        kchange = context_menu.addAction('Modifie quantité')
+        action = context_menu.exec_(self.mapToGlobal(event.pos()))
+        if action == kprint:
+            logging.info(f"Re-imprime {self}")
+            Qutil.get_parent(self, OK_app.OKanbanApp).print(self._id,self._proref, self._qte, self.data.get('date_creation'))
+        elif action == kdelete:
+            if QMessageBox.question(self, 
+                            str(self),
+                            "Voulez vous vraiment supprimer ce kanban?",
+                            QMessageBox.Yes | QMessageBox.Cancel,
+                            QMessageBox.Cancel) == QMessageBox.Yes:
+                logging.info(f"Delete {self}")
+                self.bdd.set_kanban(id=self._id, qte=0)
+        elif action == kchange:
+            qty, okPressed = QInputDialog.getInt(self, str(self), "Nouvelle quantité:", self._qte, 0, 999, 10)
+            if okPressed:
+                logging.info(f"Modifie {self} : qté => {qty}")
+                self.bdd.set_kanban(id=self._id, qte=qty)
 
 class EmptyOKanban(OKanban):
     '''Un kanban vide
@@ -117,6 +141,9 @@ class EmptyOKanban(OKanban):
     def load(self):
         if self.bdd is None:
             self.connect()    
+    
+    def contextMenuEvent(self, event: QContextMenuEvent) -> None:
+        pass
 
 class OKTitre(QLabel):
     '''Text dans le okanban
