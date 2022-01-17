@@ -72,23 +72,27 @@ class OKTab(OKbase):
         index = 0
         offset = 0
         while index < len(okprods)-1:
-            #Par 3
-            
-            #Par 2
-            if isinstance(okprods[index],OKProd) and isinstance(okprods[index+1],OKProd):
-                if okprods[index].size + okprods[index+1].size < max_size -2:
-                    p1 = self.layout.takeAt(index-offset)
-                    p2 = self.layout.takeAt(index-offset)
-                    layout = QVBoxLayout(self)
-                    layout.addItem(p1)
-                    layout.addItem(p2)
+            if isinstance(okprods[index],OKProd):
+                layout = None
+                i = 1
+                cumul_size = okprods[index].size
+                while index + i < len(okprods) and isinstance(okprods[index+i],OKProd) and cumul_size + okprods[index+i].size < max_size -2:
+                    cumul_size += okprods[index+i].size + 3#pour laisser place titre + 
+                    if layout is None:
+                        layout = QVBoxLayout(self)
+                        p0 = self.layout.takeAt(index-offset)
+                        layout.addItem(p0)
+                    pi = self.layout.takeAt(index-offset)
+                    layout.addItem(pi)
+                    i += 1
+                if layout:
                     layout.addStretch()
                     self.layout.addLayout(layout)
-                    index += 2
-                    offset +=2
+                    index += i
+                    offset += i
                 else:
                     index +=1
-            else:
+            else:               
                 index +=1
 
 
