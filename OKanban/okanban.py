@@ -16,7 +16,6 @@ class OKanban(QFrame):
 
     valueChanged = pyqtSignal(object)
 
-
     def __init__(self, id, parent = None):
         '''id : unique Id of the kanban
         '''
@@ -79,19 +78,19 @@ class OKanban(QFrame):
         self.qte = self.data.get('qte')
         self.proref = self.data.get('proref')
         self.setToolTip(self.toolTip())
-    
+
     @pyqtProperty(bool)
     def alert(self):
         return self._alert
-    
+
     @alert.setter
     def alert(self, value):
         self._alert = value
-    
+
     @pyqtProperty(bool)
     def alert_haut(self):
         return self._alert_haut
-    
+
     @alert_haut.setter
     def alert_haut(self, value):
         self._alert_haut = value
@@ -102,7 +101,7 @@ class OKanban(QFrame):
             <p><b>Ref :</b> {self._proref}</p>
             <p><b>Qté :</b> {self._qte}</p>
             <p><b>Création :</b> {self.data.get('date_creation'):%d/%m/%Y %H:%M}</p>"""
-    
+
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         context_menu = QMenu(self)
         kprint = context_menu.addAction('Ré-imprime')
@@ -113,7 +112,7 @@ class OKanban(QFrame):
             logging.info(f"Re-imprime {self}")
             Qutil.get_parent(self, OK_app.OKanbanApp).print(self._id,self._proref, self._qte, self.data.get('date_creation'))
         elif action == kdelete:
-            if QMessageBox.question(self, 
+            if QMessageBox.question(self,
                             str(self),
                             "Voulez vous vraiment supprimer ce kanban?",
                             QMessageBox.Yes | QMessageBox.Cancel,
@@ -134,14 +133,14 @@ class EmptyOKanban(OKanban):
         self._proref = ""#proref
         self._qte = ""#0
         self._id = 0
-        
+
     def __str__(self):
         return "EmptyOKanban"
 
     def load(self):
         if self.bdd is None:
-            self.connect()    
-    
+            self.connect()
+
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         pass
 

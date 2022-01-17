@@ -12,7 +12,7 @@ my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
 logging.info('OKanban gui start')
 
 parser = argparse.ArgumentParser(description='La gestion des kanbans pour Olfa')
-parser.add_argument('-t', '--title', action='store', help = "Titre de l'application", nargs='?')
+parser.add_argument('-t', '--title', action='store', help = "Titre de l'application", nargs='?', default = 'OKanbans')
 parser.add_argument('-f', '--fullscreen', action='store_true', help = "fullscreen mode")
 parser.add_argument('-m', '--mode', action='store', help = "mode : tab|input|output", nargs='?', default = 'tab')
 parser.add_argument('-H', '--host', action='store', help = "IP bdd", nargs='?', default = '192.168.0.11')

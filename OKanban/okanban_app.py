@@ -10,6 +10,7 @@ from .oktab import OKTab
 from .okinput import OKInput, OKOutput
 from .okparams import OKGenParams, OKReferences
 from .bdd import BddOKanbans
+from .version import __version__
 
 class OKanbanApp(QMainWindow):
     '''Une application pour Kanbans
@@ -26,7 +27,7 @@ class OKanbanApp(QMainWindow):
         '''
         super().__init__(parent)
         self.fullscreen = fullscreen
-        self.setWindowTitle(title)
+        self.setWindowTitle(f"{title} - {__version__}")
         #self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowFlags(
             Qt.WindowCloseButtonHint |

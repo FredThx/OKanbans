@@ -14,7 +14,7 @@ class OKbase(QFrame):
         '''Connecte the database'''
         if not self.bdd:
             self.bdd = Qutil.get_parent(self, OK_app.OKanbanApp).bdd
-    
+
     def get_ok_widgets(self, w_class = None, strict = False, layout = None, recursif = True):
         '''Return all OKprod widgets
             strict      :   if True : type() is use vs isinstance()
@@ -62,7 +62,7 @@ class OKTab(OKbase):
             #TODO
         self.rearrange()
         self.layout.addStretch()
-            
+
     def rearrange(self):
         '''Pour gagner place et lisibilité
         déplace les "petits" OKProd dans des colonnes multi produits
@@ -72,6 +72,9 @@ class OKTab(OKbase):
         index = 0
         offset = 0
         while index < len(okprods)-1:
+            #Par 3
+            
+            #Par 2
             if isinstance(okprods[index],OKProd) and isinstance(okprods[index+1],OKProd):
                 if okprods[index].size + okprods[index+1].size < max_size -2:
                     p1 = self.layout.takeAt(index-offset)
@@ -88,7 +91,7 @@ class OKTab(OKbase):
             else:
                 index +=1
 
-        
+
 
 
 class OKProd(OKbase):
@@ -100,7 +103,7 @@ class OKProd(OKbase):
         self.data = data
         self.size = 0
         self.initUI()
-        
+
     def __str__(self):
         return f"OKProd({self.data.get('proref')})"
 
@@ -112,7 +115,7 @@ class OKProd(OKbase):
         self.layout = QVBoxLayout()
         self.main_layout.addLayout(self.layout)
         self.main_layout.addStretch()
-    
+
     def toolTip(self) -> str:
         return f"""<h2>{self.data.get('proref')}</h2>
             <p><b>Qté par kanban (plein) :</b> {self.data.get('qte_kanban_plein')}</p>
