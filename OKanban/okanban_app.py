@@ -10,6 +10,7 @@ from .oktab import OKTab
 from .okinput import OKInput, OKOutput
 from .okparams import OKGenParams, OKReferences
 from .bdd import BddOKanbans
+from .okprinter import OKPrinter
 from .version import __version__
 
 class OKanbanApp(QMainWindow):
@@ -38,11 +39,14 @@ class OKanbanApp(QMainWindow):
         self.host = host
         self.port = port
         self.style = style
+        # printer pour étiquettes
         self.printer = printer
         self.printer_name = printer_name
         self.etiquette = etiquette
         self.bdd = BddOKanbans(host, port)
         self.id = self.bdd.create_new_instance()
+        # Printer pour tableau
+        self.okprinter = OKPrinter(self.bdd)
         self.on_start()
         self.initUI()
         self.timer = QTimer()
@@ -75,35 +79,54 @@ class OKanbanApp(QMainWindow):
         self.setGeometry(rect)
         #Status barre
         self.statusBar()
-        #Menu
+        # Menus
         menubar = self.menuBar()
+        ## Menu Fichier
         fileMenu = menubar.addMenu('&Fichier')
+        ### Imprime
+        self.menu_imprime = QAction('&Imprime', self)
+        self.menu_imprime.setShortcut('Ctrl+I')
+        self.menu_imprime.setStatusTip('Imprime la liste des kanbans')
+        self.menu_imprime.triggered.connect(self.okprinter.print)
+        fileMenu.addAction(self.menu_imprime)
+        ### Aperçu avnt impression
+        self.menu_apercu = QAction('Aperçu avant impression', self)
+        self.menu_apercu.setStatusTip('Aperçu de la liste des kanbans')
+        self.menu_apercu.triggered.connect(self.okprinter.apercu)
+        fileMenu.addAction(self.menu_apercu)
+        ### Quitter
         exitAction = QAction('&Quitter', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip("Ferme l'application")
         exitAction.triggered.connect(qApp.quit)
         fileMenu.addAction(exitAction)
+        ### Eteindre
         haltAction = QAction("&Eteindre", self)
         haltAction.setShortcut('CTRl+E')
         exitAction.setStatusTip("Eteindre")
         haltAction.triggered.connect(self.halt)
         fileMenu.addAction(haltAction)
+        ## Menu Mode
         modeMenu = menubar.addMenu('&Mode')
+        ### Mode Tableau
         self.mode_tabAction = QAction('Mode &Tableau', self, checkable = True)
         self.mode_tabAction.setShortcut('Ctrl+T')
         self.mode_tabAction.setStatusTip('Mode tableau pour vision planification')
         self.mode_tabAction.triggered.connect(self.toogle_mode_tab)
         modeMenu.addAction(self.mode_tabAction)
+        ### Mode Entrée
         self.mode_inputAction = QAction('Mode &Entrée', self, checkable = True)
         self.mode_inputAction.setShortcut('Ctrl+E')
         self.mode_inputAction.setStatusTip('Mode entrée pour saisie remplissage')
         self.mode_inputAction.triggered.connect(self.toogle_mode_input)
         modeMenu.addAction(self.mode_inputAction)
+        ### Mode Sortie
         self.mode_outputAction = QAction('Mode &Sortie', self, checkable = True)
         self.mode_outputAction.setShortcut('Ctrl+S')
         self.mode_outputAction.setStatusTip('Mode sortie pour saisie consommation')
         self.mode_outputAction.triggered.connect(self.toogle_mode_output)
         modeMenu.addAction(self.mode_outputAction)
+        # Mode paramètres
         self.mode_parametres = QAction('Mode &Paramètres', self, checkable = True)
         self.mode_parametres.setShortcut('Ctrl+P')
         self.mode_parametres.setStatusTip('paramètres')
@@ -226,6 +249,7 @@ class OKanbanApp(QMainWindow):
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         if msg.exec_() == QMessageBox.Ok:
             os.system("sudo halt")
+
 
 class OKanbanWorker(QObject):
     '''Un objet pour executer du code en //
