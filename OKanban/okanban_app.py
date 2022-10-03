@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import logging, time, datetime, os
+import logging, time, datetime, os, pathlib
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea, QMessageBox
 #from PyQt5.QtGui import x
@@ -11,7 +11,9 @@ from .okinput import OKInput, OKOutput
 from .okparams import OKGenParams, OKReferences
 from .bdd import BddOKanbans
 from .okprinter import OKPrinter
-from .version import __version__
+from .okexport import OKExport
+from .version import __version__, __repo__, __owner__
+from .fgithub import FGithub
 
 class OKanbanApp(QMainWindow):
     '''Une application pour Kanbans
@@ -47,11 +49,26 @@ class OKanbanApp(QMainWindow):
         self.id = self.bdd.create_new_instance()
         # Printer pour tableau
         self.okprinter = OKPrinter(self.bdd)
+        # Pour Export
+        self.exporter = OKExport(self.bdd)
         self.on_start()
         self.initUI()
         self.timer = QTimer()
         self.timer.timeout.connect(self.on_timer)
         self.timer.start(1000)
+        # Mise à jour de l'application
+        okgithub = FGithub(__owner__, __repo__)
+        if okgithub.get_lastest_tag() != __version__:
+            if QMessageBox.question(self,
+                            "Mise à jour",
+                            "Une nouvelle version est disponible. Voulez vous l'installer?",
+                            QMessageBox.Yes | QMessageBox.Cancel,
+                            QMessageBox.Cancel) == QMessageBox.Yes:
+                path = pathlib.Path().resolve()
+                if okgithub.update_from_lastest(path):
+                    QMessageBox.information(self,
+                                            "Mise à jour",
+                                            "La mise a jour à aboutie. Merci de femer et reouvrir l'application.")
 
     def closeEvent(self, event):
         '''Supprime inscription à la bdd
@@ -94,6 +111,12 @@ class OKanbanApp(QMainWindow):
         self.menu_apercu.setStatusTip('Aperçu de la liste des kanbans')
         self.menu_apercu.triggered.connect(self.okprinter.apercu)
         fileMenu.addAction(self.menu_apercu)
+        ### Export Excel
+        self.menu_export = QAction('&Export..', self)
+        self.menu_export.setShortcut('Ctrl+E')
+        self.menu_export.setStatusTip('Export vers Excel')
+        self.menu_export.triggered.connect(self.exporter.export)
+        fileMenu.addAction(self.menu_export)
         ### Quitter
         exitAction = QAction('&Quitter', self)
         exitAction.setShortcut('Ctrl+Q')
@@ -249,6 +272,8 @@ class OKanbanApp(QMainWindow):
         msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         if msg.exec_() == QMessageBox.Ok:
             os.system("sudo halt")
+
+    #TODO demander un nom de fichier + path et créer le fichier
 
 
 class OKanbanWorker(QObject):
