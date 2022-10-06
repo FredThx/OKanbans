@@ -2,7 +2,7 @@
 
 import logging, time, datetime, os, pathlib
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QStackedWidget, QVBoxLayout, QScrollArea, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, qApp, QWidget, QAction, QVBoxLayout, QScrollArea, QMessageBox
 #from PyQt5.QtGui import x
 from PyQt5.QtCore import QTimer, QThread, QObject, Qt, QRect, QPoint
 

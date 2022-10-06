@@ -33,23 +33,26 @@ class FGithub:
             return {asset.get("name"):asset.get("browser_download_url") for asset in self.props.get('assets',[])}
 
     def update_from_lastest(self, path = '.'):
-        for name, url in self.get_lastest_download_url().items():
-            logging.info(f"Download {name} from {url}...")
-            try:
-                response = requests.get(url)
-            except Exception as e:
-                logging.error(e)
-            else:
-                file = Path(path) / name
-                logging.info(f"Download done. Store file at {file}")
+        if check_permissions(path):
+            for name, url in self.get_lastest_download_url().items():
+                logging.info(f"Download {name} from {url}...")
                 try:
-                    with open(file,'wb') as open_file:
-                        open_file.write(response.content)
-                except OSError as e:
+                    response = requests.get(url)
+                except Exception as e:
                     logging.error(e)
-                    break
-        return True
-
+                else:
+                    file = Path(path) / name
+                    logging.info(f"Download done. Store file at {file}")
+                    try:
+                        with open(file,'wb') as open_file:
+                            open_file.write(response.content)
+                    except OSError as e:
+                        logging.error(e)
+                        break
+            return True
+    
+    def check_permissions(self, path):
+        pass
 
 if __name__=='__main__':
     from FUTIL.my_logging import *
