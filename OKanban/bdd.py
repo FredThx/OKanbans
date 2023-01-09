@@ -157,12 +157,15 @@ class BddOKanbans(object):
             if date_creation is None:
                 date_creation = datetime.datetime.now()
             kanban['date_creation'] = date_creation
+            mvt = {'date' : date_creation, 'type' : 'creation', 'qte' : qte}
+            kanban['mvts'] = [mvt]
             self.kanbans.insert_one(kanban)
         else:
             kanban = self.get_list(self.kanbans.find({'id' : id}))
             assert len(kanban)>0, "unknow id"
             assert len(kanban)==1, f"Oups, duplicate id found in kanbans: {kanban}"
             kanban = kanban[0]
+            qte0 = kanban['qte']
             if proref:
                 assert proref in [ref.get('proref') for ref in self.get_references()], f"{proref} not present in references."
                 kanban['proref']=proref
@@ -170,6 +173,12 @@ class BddOKanbans(object):
                 kanban['qte'] = int(qte)
             if date_creation:
                 kanban['date_creation'] = date_creation
+            mvt = {
+                'date' : date_creation or datetime.datetime.now(),
+                'type' : 'production' if qte>qte0 else 'consommation',
+                'qte' : qte - qte0
+                }
+            kanban['mvts'] = (kanban.get('mvts') or [])+[mvt]
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})
             #TODO : ajouter historique
         self.cache_kanbans = None
