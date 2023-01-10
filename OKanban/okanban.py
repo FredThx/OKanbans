@@ -118,12 +118,12 @@ class OKanban(QFrame):
                             QMessageBox.Yes | QMessageBox.Cancel,
                             QMessageBox.Cancel) == QMessageBox.Yes:
                 logging.info(f"Delete {self}")
-                self.bdd.set_kanban(id=self._id, qte=0)
+                self.bdd.set_kanban(id=self._id, qte=0, type = "suppression")
         elif action == kchange:
             qty, okPressed = QInputDialog.getInt(self, str(self), "Nouvelle quantité:", self._qte, 0, 999, 10)
             if okPressed:
                 logging.info(f"Modifie {self} : qté => {qty}")
-                self.bdd.set_kanban(id=self._id, qte=qty)
+                self.bdd.set_kanban(id=self._id, qte=qty, type = "modification")
 
 class EmptyOKanban(OKanban):
     '''Un kanban vide

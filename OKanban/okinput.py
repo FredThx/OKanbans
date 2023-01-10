@@ -126,7 +126,7 @@ class OKInput(OKES):
         proref = self.edit_reference.text()
         qte = int(self.edit_qty.text())
         try:
-            id = self.bdd.set_kanban(proref=proref, qte=qte)
+            id = self.bdd.set_kanban(proref=proref, qte=qte, type = "creation")
             self.app.print(id, proref, qte)
             messagebox = TimerMessageBox(f"Création du kanban n°{id} : {qte} {proref}.", 3, self)
             messagebox.exec_()
@@ -219,7 +219,7 @@ class OKOutput(OKES):
             qte_kanban = kanban.get('qte')
             proref = kanban.get('proref')
             try:
-                self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever)
+                self.bdd.set_kanban(id=id, qte=qte_kanban - qte_a_enlever, type = "consommation")
                 if qte_kanban - qte_a_enlever>0:
                     messagebox = TimerMessageBox(f"Le kanban n°{id} est partiellement consommé. Il reste {qte_kanban - qte_a_enlever} {proref}", 3, self)
                 else:

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import pymongo, datetime, logging, time
+import pymongo, datetime, logging, time, socket
 from bson.decimal128 import Decimal128
 from bson.codec_options import TypeCodec
 from bson.codec_options import TypeRegistry
@@ -139,7 +139,7 @@ class BddOKanbans(object):
         self.set_params(self.param_last_id, id)
         return id
 
-    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None):
+    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None):
         ''' Create or change a kanban
         '''
         kanban ={}
@@ -157,7 +157,7 @@ class BddOKanbans(object):
             if date_creation is None:
                 date_creation = datetime.datetime.now()
             kanban['date_creation'] = date_creation
-            mvt = {'date' : date_creation, 'type' : 'creation', 'qte' : qte}
+            mvt = {'date' : date_creation, 'type' : type or 'creation', 'qte' : qte, 'hostname' : socket.gethostname()}
             kanban['mvts'] = [mvt]
             self.kanbans.insert_one(kanban)
         else:
@@ -175,8 +175,9 @@ class BddOKanbans(object):
                 kanban['date_creation'] = date_creation
             mvt = {
                 'date' : date_creation or datetime.datetime.now(),
-                'type' : 'production' if qte>qte0 else 'consommation',
-                'qte' : qte - qte0
+                'type' : type or ('production' if qte>qte0 else 'consommation'),
+                'qte' : qte - qte0,
+                'hostname' : socket.gethostname()
                 }
             kanban['mvts'] = (kanban.get('mvts') or [])+[mvt]
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})

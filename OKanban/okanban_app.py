@@ -58,7 +58,7 @@ class OKanbanApp(QMainWindow):
         self.timer.start(1000)
         # Mise à jour de l'application
         okgithub = FGithub(__owner__, __repo__)
-        if okgithub.get_lastest_tag() != __version__:
+        if okgithub.get_lastest_tag() != __version__: #todo : faire un <
             if QMessageBox.question(self,
                             "Mise à jour",
                             "Une nouvelle version est disponible. Voulez vous l'installer?",
