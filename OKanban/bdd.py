@@ -142,8 +142,8 @@ class BddOKanbans(object):
     def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None):
         ''' Create or change a kanban
         '''
-        kanban ={}
         if id is None:
+            kanban ={'triggered' : False}
             kanban['id'] = self.get_id()
             assert proref is not None, "proref is needed to create a new kanban."
             reference = self.get_list(self.get_references(proref))
@@ -157,7 +157,13 @@ class BddOKanbans(object):
             if date_creation is None:
                 date_creation = datetime.datetime.now()
             kanban['date_creation'] = date_creation
-            mvt = {'date' : date_creation, 'type' : type or 'creation', 'qte' : qte, 'hostname' : socket.gethostname()}
+            mvt = {
+                    'date' : date_creation,
+                    'type' : type or 'creation',
+                    'qte' : qte,
+                    'hostname' : socket.gethostname(),
+                    'triggered' : False
+                    }
             kanban['mvts'] = [mvt]
             self.kanbans.insert_one(kanban)
         else:
@@ -177,11 +183,12 @@ class BddOKanbans(object):
                 'date' : date_creation or datetime.datetime.now(),
                 'type' : type or ('production' if qte>qte0 else 'consommation'),
                 'qte' : qte - qte0,
-                'hostname' : socket.gethostname()
+                'hostname' : socket.gethostname(),
+                'triggered' : False
                 }
             kanban['mvts'] = (kanban.get('mvts') or [])+[mvt]
+            kanban['triggered'] : False
             self.kanbans.update_many({'id' : id}, {'$set' : kanban})
-            #TODO : ajouter historique
         self.cache_kanbans = None
         self.send_message_new(kanban['id'])
         return kanban['id']
