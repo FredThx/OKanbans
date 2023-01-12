@@ -192,15 +192,23 @@ class BddOKanbans(object):
         self.cache_kanbans = None
         self.send_message_new(kanban['id'])
         return kanban['id']
-        
-    def get_kanbans(self, id=None, proref = None, all = False):
+
+    def set_kanban_triggered(self, kanban):
+        self.kanbans.update_many({'id' : kanban['id']}, {'$set' : kanban})
+        #On pourrait aussi utiliser '_id': ObjectId('63be737b29396473e1c6125f')
+
+    def get_kanbans(self, id=None, proref = None, all = False, only_not_triggered = False):
         '''Renvoie la liste des kanbans (limité à 1 éventuellement ou proref)
         (avec systeme cache)
         all     :   si False ou omis : uniquement les kanbans non vides
                     si True : tous les kanbans (pas de cache)
+        only_not_triggered : si True : uniquement les kanbans non triggered (pas de cache)
         '''
         if all:
             return self.get_list(self.kanbans.find())
+        elif only_not_triggered:
+            filter = {'triggered' : False}
+            return self.get_list(self.kanbans.find(filter))
         else:
             filter={'qte' : {'$gt' : 0}}
             if not(self.cache_kanbans and self.cache_kanbans_timeout and self.cache_kanbans_timeout > time.time()):

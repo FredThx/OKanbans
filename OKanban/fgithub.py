@@ -33,7 +33,7 @@ class FGithub:
             return {asset.get("name"):asset.get("browser_download_url") for asset in self.props.get('assets',[])}
 
     def update_from_lastest(self, path = '.'):
-        if check_permissions(path):
+        if self.check_permissions(path):
             for name, url in self.get_lastest_download_url().items():
                 logging.info(f"Download {name} from {url}...")
                 try:
