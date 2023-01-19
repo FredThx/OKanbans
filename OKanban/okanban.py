@@ -96,11 +96,20 @@ class OKanban(QFrame):
         self._alert_haut = value
 
     def toolTip(self) -> str:
-        return f"""
+        tooltip = f"""
             <h2>Id:{self._id or 'vide'}</h2>
             <p><b>Ref :</b> {self._proref}</p>
-            <p><b>Qté :</b> {self._qte}</p>
-            <p><b>Création :</b> {self.data.get('date_creation'):%d/%m/%Y %H:%M}</p>"""
+            <p><b>Qté :</b> {self._qte}</p>"""
+        if self.data.get('mvts'):
+            tooltip += "<p><b>Mouvements :</b></p>"
+            for mvt in self.data.get('mvts',[]):
+                date = mvt.get('date')
+                type = mvt.get('type').capitalize()
+                qte = mvt.get('qte')
+                tooltip += f'<p>{date:%d/%m/%Y %H:%M} {type} : {qte}</p>'
+        else:
+            tooltip += f"<p><b>Création :</b> {self.data.get('date_creation'):%d/%m/%Y %H:%M}</p>"
+        return tooltip
 
     def contextMenuEvent(self, event: QContextMenuEvent) -> None:
         context_menu = QMenu(self)
