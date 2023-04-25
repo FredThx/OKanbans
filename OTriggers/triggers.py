@@ -6,19 +6,21 @@ Script qui va chercher dans les mouvements des kanbans
 
 et génère un suivi de production (via api sur srv-tse:50888)
 
-Executer tous les jours par 
+Executer tous les jours par SRV-DEBIAN toutes les 10 minutes
+Crontab : */10 7-16 * * 1-5 /usr/local/bin/python3 /home/administrateur/commun/ApplicationsOLFA/OKanbans/OTriggers/triggers.py
+
 
 '''
 
 
-import sys, os, datetime
+import sys, os, datetime, socket
 sys.path.append(os.path.join(sys.path[0],'..','OKanban'))
 from bdd import BddOKanbans
 from silvercs import HttpSilverCS
 from FUTIL.my_logging import *
 
 my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
-logging.info('OKanban Triggers start.')
+logging.info(f'OKanban Triggers start on {socket.gethostname()}')
 
 bdd = BddOKanbans('192.168.0.11')
 silverCS = HttpSilverCS("192.168.0.6", 50888, user = "olfa", password = "montage08380")
