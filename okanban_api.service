@@ -1,0 +1,19 @@
+[Unit]
+Description= API pour Okanban
+After=syslog.target network.target # quand les autres services sont ACTIFS
+Documentation=man:cron(8)  # pour man.service
+
+[Service]
+TimeoutStartSec=0
+WorkingDirectory = /opt/OKanban
+ExecStart=/usr/local/bin/python3 /opt/OKanban/okanban_api.py
+Type = simple
+RemainAfterExit = no
+User = root
+Killmode = process
+Restart=on-failure
+RestartSec=5s
+
+
+[Install]
+WantedBy=multi-user.target
