@@ -69,11 +69,12 @@ class OkanbanApi(Resource):
         args['conforme']=args.get('conforme')=='-1'
         # todo : trier les mesures P1, R1, ...
         args['date'] = datetime.date.today().strftime("%d/%m/%Y")
+        args['mesures'] = {cote : float(mesure.replace(',','.')) for cote, mesure in args.get('mesures',{}).items()}
         #Creation d'un kanban
         id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'))
         #Imprime une étiquette kanban
         args['id'] = id
-        args['mesures'] = ', '.join([f"{cote}:{float(mesure.replace(',','.'))}" for cote, mesure in args.get('mesures',{}).items()])
+        args['mesures'] = ', '.join([f"{cote}:{mesure}" for cote, mesure in args.get('mesures',{}).items()])
         args['printer'] = okanban_printer_name
         args['date_creation'] = args['date']
         del args['date']
