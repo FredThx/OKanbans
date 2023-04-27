@@ -139,9 +139,10 @@ class BddOKanbans(object):
         self.set_params(self.param_last_id, id)
         return id
 
-    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None, mesures = None):
+    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None, mesures = None, conforme = None):
         ''' Create or change a kanban
         mesures : mesures du perçage
+        conforme : perçage conforme
         '''
         if id is None:
             kanban ={'triggered' : False}
@@ -167,6 +168,7 @@ class BddOKanbans(object):
                     }
             kanban['mvts'] = [mvt]
             kanban['mesures'] = mesures
+            kanban['conforme'] = conforme
             self.kanbans.insert_one(kanban)
         else:
             kanban = self.get_list(self.kanbans.find({'id' : id}))

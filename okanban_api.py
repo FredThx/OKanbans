@@ -71,7 +71,7 @@ class OkanbanApi(Resource):
         args['date'] = datetime.date.today().strftime("%d/%m/%Y")
         args['mesures'] = {cote : float(mesure.replace(',','.')) for cote, mesure in args.get('mesures',{}).items()}
         #Creation d'un kanban
-        id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'))
+        id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'))
         #Imprime une étiquette kanban
         args['id'] = id
         args['mesures'] = ', '.join([f"{cote}:{mesure}" for cote, mesure in args.get('mesures',{}).items()])
