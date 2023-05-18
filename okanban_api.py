@@ -9,7 +9,7 @@ from flask import Flask, request
 from flask_restful import abort, Api, Resource, reqparse
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
+import datetime, json
 
 from OKanban.bdd import BddOKanbans
 from OKanban.nicelabel import HttpNiceLabel
@@ -66,7 +66,7 @@ class OkanbanApi(Resource):
         '''
         #args = request.get_json(force=True)
         args = okanban_api_parser.parse_args()
-        args['conforme']=args.get('conforme')=='-1'
+        args['conforme']= "OK" if args.get('conforme')=='-1' else "NOK"
         # todo : trier les mesures P1, R1, ...
         args['date'] = datetime.date.today().strftime("%d/%m/%Y")
         args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
@@ -81,6 +81,13 @@ class OkanbanApi(Resource):
         args['qty'] = 1 # Nb d'étiquettes
         args['etiquette'] = okanban_etiquette
         print(args)
+        #Bricolo pour dépanner
+        args['mesures'] = args['mesures'].replace("'",'"')
+        args['mesures'] = "{" + args['mesures'] + "}"
+        for key in [f'P{i}' for i in range(10)]+[f'R{i}' for i in range(10)] + ['XD','X1', 'X2', 'XP']:
+            args['mesures'] = args['mesures'].replace(key, '"'+key+'"')
+        args['mesures'] = json.loads(args['mesures'])
+        args['mesures'] = str({cote : mesure.get('value') for cote, mesure in args.get('mesures').items()})
         okanban_printer.print(**args)
         logging.info(f"POST : Création kanban : {args}")
         return "OK", 200 #TODO : renvoyer Id (et le gérer dans access!!)
