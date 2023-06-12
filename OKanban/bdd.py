@@ -224,6 +224,12 @@ class BddOKanbans(object):
                 return [k for k in self.cache_kanbans if k.get('proref')==proref]
             else:
                 return self.cache_kanbans
+    def delete_kanban(self, id):
+        '''Delete a kanban (not just set qte to zéro)
+        '''
+        result = self.kanbans.delete_one({'id' : id})
+        logging.info(f"Delete kanban (id = {id}) in bdd : {result.raw_result}")
+        return result
 
     def send_message_new(self, id):
         '''Envoie à toutes les instances de l'application la notification qu'un kanban a été créé
