@@ -5,11 +5,10 @@ Script qui va chercher dans les mouvements des kanbans
 - si le type de mouvement n'est pas une consommation
 
 et génère un suivi de production (via api sur srv-tse:50888)
+et envoie un email à qualite@olfa.fr si un contrôle n'est pas conforme.
 
 Executer tous les jours par SRV-DEBIAN toutes les 10 minutes
 Crontab : */10 7-16 * * 1-5 /usr/local/bin/python3 /home/administrateur/commun/ApplicationsOLFA/OKanbans/OTriggers/triggers.py
-
-
 '''
 
 
@@ -17,7 +16,9 @@ import sys, os, datetime, socket
 sys.path.append(os.path.join(sys.path[0],'..','OKanban'))
 from bdd import BddOKanbans
 from silvercs import HttpSilverCS
+from smtp import Smtp
 from FUTIL.my_logging import *
+import markdown
 
 my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
 logging.info(f'OKanban Triggers start on {socket.gethostname()}')
@@ -25,6 +26,7 @@ logging.info(f'OKanban Triggers start on {socket.gethostname()}')
 bdd = BddOKanbans('192.168.0.11')
 silverCS = HttpSilverCS("192.168.0.6", 50888, user = "olfa", password = "montage08380")
 produit_2_passes = [p.get('PUB_SDTPRA_proref') for p in silverCS.get_produits_zpa("7SF2","O")]
+smtp = Smtp('SRV-SQL', 25, 'courrier@olfa.fr', 'courrier@olfa.fr', "huit8\\_8", starttls=False)
 
 def crt_suivi(proref, qte, date_prod = None, matricule = 'A', openum = '10'):
     ''' Crée un suivi de production sur le produit
@@ -48,9 +50,13 @@ def crt_suivi(proref, qte, date_prod = None, matricule = 'A', openum = '10'):
     else:
         raise Exception(f"N° d'OF non trouvé pour {proref}")
 
+kanbans_errors = []
+
 for kanban in bdd.get_kanbans(only_not_triggered=True):
     logging.debug(f"kanban not trigered : {kanban}")
     proref = kanban.get('proref')
+    if kanban.get('conforme') == 'NOK':
+        kanbans_errors.append(kanban)
     for mvt in kanban.get('mvts',[]):
         if mvt.get('triggered') == False:
             if mvt.get('type') == 'creation':
@@ -88,6 +94,15 @@ for kanban in bdd.get_kanbans(only_not_triggered=True):
         logging.warning(f"Kanban {kanban['id']} fail to be triggered!!!")
     bdd.set_kanban_triggered(kanban)
 
-
+# Email si kanbans non conforme
+if kanbans_errors:
+    txt = "Il existe des mesures de perçage non conforme : \n\n"
+    for kanban in kanbans_errors:
+        txt += f"## Id = {kanban.get('id')} : {kanban.get('proref')}\n"
+        for key, mesure in kanban.get('mesures').items():
+            if mesure.get('result')=='Faux':
+                txt += f"> {key} : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})"
+    smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
+    smtp.send('qualite@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
 
 
