@@ -51,12 +51,15 @@ def crt_suivi(proref, qte, date_prod = None, matricule = 'A', openum = '10'):
         raise Exception(f"N° d'OF non trouvé pour {proref}")
 
 kanbans_errors = []
+kanbans_ok = []
 
 for kanban in bdd.get_kanbans(only_not_triggered=True):
     logging.debug(f"kanban not trigered : {kanban}")
     proref = kanban.get('proref')
     if kanban.get('conforme') == 'NOK':
         kanbans_errors.append(kanban)
+    else:
+        kanbans_ok.append(kanban)
     for mvt in kanban.get('mvts',[]):
         if mvt.get('triggered') == False:
             if mvt.get('type') == 'creation':
@@ -70,7 +73,7 @@ for kanban in bdd.get_kanbans(only_not_triggered=True):
                         mvt['triggered'] = True
                 else:
                     mvt['triggered'] = True
-            elif mvt.get('type') == 'modification':
+            elif mvt.get('type') in ['modification', 'suppression']:
                 logging.debug(f"modification : {mvt}")
                 if proref in produit_2_passes:
                     try:
@@ -101,8 +104,11 @@ if kanbans_errors:
         txt += f"## Id = {kanban.get('id')} : {kanban.get('proref')}\n"
         for key, mesure in kanban.get('mesures').items():
             if mesure.get('result')=='Faux':
-                txt += f"> {key} : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})"
+                txt += f"> {key} : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})\n"
     smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     smtp.send('qualite@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
+else:
+    if kanbans_ok:
+        smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(f"Tout est ok!\n{len(kanbans_ok)} kanbans ok."), type = 'html')
 
 
