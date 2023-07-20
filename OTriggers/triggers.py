@@ -58,6 +58,7 @@ for kanban in bdd.get_kanbans(only_not_triggered=True):
     proref = kanban.get('proref')
     if kanban.get('conforme') == 'NOK':
         kanbans_errors.append(kanban)
+        logging.info(f"Kanban {kanban.get('id')} : {kanban.get['proref']} n'est pas conforme.")
     else:
         kanbans_ok.append(kanban)
     for mvt in kanban.get('mvts',[]):
@@ -107,8 +108,10 @@ if kanbans_errors:
                 txt += f"> {key} : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})\n"
     smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     smtp.send('qualite@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
+    logging.info(f"Email sent : {txt}")
 else:
     if kanbans_ok:
         smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(f"Tout est ok!\n{len(kanbans_ok)} kanbans ok."), type = 'html')
 
+logging.info(f'OKanban Triggers end on {socket.gethostname()}')
 
