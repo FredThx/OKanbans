@@ -58,7 +58,7 @@ for kanban in bdd.get_kanbans(only_not_triggered=True):
     proref = kanban.get('proref')
     if kanban.get('conforme') == 'NOK':
         kanbans_errors.append(kanban)
-        logging.info(f"Kanban {kanban.get('id')} : {kanban.get['proref']} n'est pas conforme.")
+        logging.info(f"Kanban {kanban.get('id')} : {kanban.get('proref')} n'est pas conforme.")
     else:
         kanbans_ok.append(kanban)
     for mvt in kanban.get('mvts',[]):
