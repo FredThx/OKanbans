@@ -72,7 +72,7 @@ class OkanbanApi(Resource):
         args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         #args['mesures']['controleur'] = args.get('operateur')
         #Creation d'un kanban
-        id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'))
+        id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
         try:
             #Imprime une étiquette kanban
             args['id'] = id
