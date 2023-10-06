@@ -105,7 +105,7 @@ if kanbans_errors:
         txt += f"## Id = {kanban.get('id')} : {kanban.get('proref')}\n"
         for key, mesure in kanban.get('mesures').items():
             if mesure.get('result')=='Faux':
-                txt += f"> {key} : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})\n"
+                txt += f"> **{key}** : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})<br>"
     smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     smtp.send('qualite@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     logging.info(f"Email sent : {txt}")
