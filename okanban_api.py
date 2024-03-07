@@ -63,13 +63,26 @@ class OkanbanApi(Resource):
     @auth.login_required
     def post(self):
         '''Création d'un kanban
+        args : {
+            'proref': '7TDSIEGE',
+            'qte': 99,
+            'date': '07/03/2024',
+            'remarques': '',
+            'conforme': 'OK',
+            'operateur': 'Frédéric Thomé',
+            'mesures': {
+                'P1': {'value': '7', 'result': 'Vrai', 'mini': '6', 'maxi': '12'},
+                'P2': {'value': '7', 'result': 'Faux', 'mini': '6', 'maxi': '12'},...
         '''
         #args = request.get_json(force=True)
         args = okanban_api_parser.parse_args()
-        args['conforme']= "OK" if args.get('conforme')=='-1' else "NOK"
+        args['conforme']= "OK" if args.get('conforme')in ['-1', 'OK'] else "NOK"
         # todo : trier les mesures P1, R1, ...
         args['date'] = datetime.date.today().strftime("%d/%m/%Y")
-        args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
+        try: #For access 97
+            args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
+        except AttributeError:
+            args['mesures'] = {cote : {k : ('Vrai' if v else 'Faux') if (v is None or type(v)==bool) else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         #args['mesures']['controleur'] = args.get('operateur')
         #Creation d'un kanban
         id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
