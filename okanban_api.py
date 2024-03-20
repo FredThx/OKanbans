@@ -45,6 +45,7 @@ okanban_api_parser.add_argument('remarques', type=str)
 okanban_api_parser.add_argument('conforme', type=str)
 okanban_api_parser.add_argument('operateur', type=str)
 okanban_api_parser.add_argument('mesures', type=dict)
+okanban_api_parser.add_argument('only_print', type=bool)
 
 class OkanbanApi(Resource):
     @auth.login_required
@@ -74,40 +75,32 @@ class OkanbanApi(Resource):
                 'P1': {'value': '7', 'result': 'Vrai', 'mini': '6', 'maxi': '12'},
                 'P2': {'value': '7', 'result': 'Faux', 'mini': '6', 'maxi': '12'},...
         '''
-        #args = request.get_json(force=True)
         args = okanban_api_parser.parse_args()
-        args['conforme']= "OK" if args.get('conforme')in ['-1', 'OK'] else "NOK"
-        # todo : trier les mesures P1, R1, ...
+        args['conforme']= "OK" if args.get('conforme')in ['-1', 'OK', 'True'] else "NOK"
         args['date'] = datetime.date.today().strftime("%d/%m/%Y")
         try: #For access 97
             args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         except AttributeError:
             args['mesures'] = {cote : {k : ('Vrai' if v else 'Faux') if (v is None or type(v)==bool) else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
-        #args['mesures']['controleur'] = args.get('operateur')
-        #Creation d'un kanban
-        id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
+        if not args.get('only_print'):
+            #Creation d'un kanban
+            id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
+        else:
+            id = ""
         try:
             #Imprime une étiquette kanban
             args['id'] = id
-            args['mesures'] = ', '.join([f"{cote}:{mesure}" for cote, mesure in args.get('mesures',{}).items()])
             args['printer'] = okanban_printer_name
             args['date_creation'] = args['date']
             del args['date']
             args['qty'] = 1 # Nb d'étiquettes
             args['etiquette'] = okanban_etiquette
-            print(args)
-            #Bricolo pour dépanner
-            args['mesures'] = args['mesures'].replace("'",'"')
-            args['mesures'] = "{" + args['mesures'] + "}"
-            args['mesures'] = re.sub(r'((?:[[PR][0-9]{1,2}|X[12DP])):',r'"\1":', args['mesures'])
-            #for key in [f'P{i}' for i in range(12)]+[f'R{i}' for i in range(12)] + ['XD','X1', 'X2', 'XP']:
-            #    args['mesures'] = args['mesures'].replace(key, '"'+key+'"')
-            args['mesures'] = json.loads(args['mesures'])########
-            args['mesures'] = str({cote : mesure.get('value') for cote, mesure in args.get('mesures').items()})
+            args['mesures'] = "\n".join([f"{mesure['cote']} : {mesure['value']}"  for mesure in args['mesures'].values() if mesure['result']!= 'Vrai'])
             okanban_printer.print(**args)
         except Exception as e:
             logging.error(e)
-            okanban_bdd.delete_kanban(id)
+            if id:
+                okanban_bdd.delete_kanban(id)
             return f"Error on API OKanbans: {e}", 400
         else:
             logging.info(f"POST : Création kanban : {args}")
