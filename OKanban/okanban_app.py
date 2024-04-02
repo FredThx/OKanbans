@@ -248,10 +248,7 @@ class OKanbanApp(QMainWindow):
     def print(self, id, proref, qte, date_creation = None):
         '''Imprime une étiquette kanban
         '''
-        try:
-            printer_name = self.printer_name or self.bdd.get_params("printer")[0] 
-        except IndexError:
-            printer_name = None
+        printer_name = self.printer_name or self.bdd.get_param("printer")
         if self.printer and printer_name and self.etiquette:
             if date_creation is None:
                 date_creation = datetime.date.today()

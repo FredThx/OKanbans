@@ -90,7 +90,7 @@ class OkanbanApi(Resource):
         try:
             #Imprime une étiquette kanban
             args['id'] = id
-            args['printer'] = okanban_printer_name or okanban_bdd.get_params('printer')[0]
+            args['printer'] = okanban_printer_name or okanban_bdd.get_params('printer')
             args['date_creation'] = args['date']
             del args['date']
             args['qty'] = 1 # Nb d'étiquettes

@@ -111,6 +111,14 @@ class BddOKanbans(object):
         else:
             filter = {}
         return self.get_list(self.params.find(filter))
+    
+    def get_param(self, param:str):
+        ''' Get value of one param
+        '''
+        try:
+            return self.get_params(param=param)[0].get('value')
+        except Exception:
+            return None
 
     def set_params(self,param, value):
         '''Save param / value on bdd
