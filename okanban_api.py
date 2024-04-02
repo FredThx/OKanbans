@@ -23,8 +23,8 @@ api = Api(app)
 
 okanban_bdd = BddOKanbans('192.168.0.11')
 okanban_printer = HttpNiceLabel('http://192.168.0.6:56425')
+okanban_printer_name = None
 #okanban_printer_name = "IMP_TEST"
-okanban_printer_name = "\\\\SRV-DATA\\ZEBRA PERCAGE"
 okanban_etiquette = "ET_PER_API"
 
 auth = HTTPBasicAuth()
@@ -90,7 +90,7 @@ class OkanbanApi(Resource):
         try:
             #Imprime une étiquette kanban
             args['id'] = id
-            args['printer'] = okanban_printer_name
+            args['printer'] = okanban_printer_name or okanban_bdd.get_params('printer')[0]
             args['date_creation'] = args['date']
             del args['date']
             args['qty'] = 1 # Nb d'étiquettes

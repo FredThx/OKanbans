@@ -26,7 +26,7 @@ class OKanbanApp(QMainWindow):
             - port              :    database ip port
             - style             :   css file name
             - printer           :   Nicelabel printer
-            - printer_name      :   path of the printer (ex : '\\\\SERVEUR\\imprimante')
+            - printer_name      :   path of the printer (ex : '\\\\SERVEUR\\imprimante') si non spécifié : selon paramètre
         '''
         super().__init__(parent)
         self.fullscreen = fullscreen
@@ -248,13 +248,17 @@ class OKanbanApp(QMainWindow):
     def print(self, id, proref, qte, date_creation = None):
         '''Imprime une étiquette kanban
         '''
-        if self.printer and self.printer_name and self.etiquette:
+        try:
+            printer_name = self.printer_name or self.bdd.get_params("printer")[0] 
+        except IndexError:
+            printer_name = None
+        if self.printer and printer_name and self.etiquette:
             if date_creation is None:
                 date_creation = datetime.date.today()
             if isinstance(date_creation, datetime.date):
                 date_creation = date_creation.strftime("%d/%m/%Y")
             datas = {'id':id, 'proref':proref, 'qte' : qte, 'date_creation':date_creation}
-            datas['printer'] = self.printer_name
+            datas['printer'] = printer_name
             datas['qty'] = 1
             datas['etiquette'] = self.etiquette
             logging.debug(f"nicelabel.print({datas})")
