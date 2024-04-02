@@ -17,7 +17,7 @@ parser.add_argument('-f', '--fullscreen', action='store_true', help = "fullscree
 parser.add_argument('-m', '--mode', action='store', help = "mode : tab|input|output", nargs='?', default = 'tab')
 parser.add_argument('-H', '--host', action='store', help = "IP bdd", nargs='?', default = '192.168.0.11')
 parser.add_argument('-s', '--style', action = 'store', help = 'style (fichier css)', nargs = '?', default = 'okanbans.css')
-parser.add_argument('-p', '--printer', action = 'store', dest = 'printer_name', help ='imprimante pour les étiquettes (chemin windows)', nargs = '?', default = '\\\\SRV-DATA\\ZEBRA PERCAGE')
+parser.add_argument('-p', '--printer', action = 'store', dest = 'printer_name', help ='imprimante pour les étiquettes (chemin windows)', nargs = '?')
 parser.add_argument('-e', '--etiquette', action = 'store', help = "nom du format d'étiquette (Nicelabel)", nargs = '?', default = 'ET_PER_1')
 
 args = parser.parse_args()
