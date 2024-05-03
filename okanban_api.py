@@ -60,7 +60,13 @@ class OkanbanApi(Resource):
             ref = ref[0]
             logging.info(f"GET {proref}=>{ref.get('qte_kanban_plein')}")
             return ref.get('qte_kanban_plein')
-        
+
+    t_validation = {
+        True : 'Vrai',
+        False : 'Faux',
+        None : ''
+    }    
+    
     @auth.login_required
     def post(self):
         '''Création d'un kanban
@@ -81,7 +87,7 @@ class OkanbanApi(Resource):
         try: #For access 97
             args['mesures'] = {cote : {k : float(v.replace(',','.')) if v.replace(',','.').isnumeric() else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         except AttributeError:
-            args['mesures'] = {cote : {k : ('Vrai' if v else 'Faux') if (v is None or type(v)==bool) else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
+            args['mesures'] = {cote : {k : self.t_validation.get(v,'') if (v is None or type(v)==bool) else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         if not args.get('only_print'):
             #Creation d'un kanban
             id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
@@ -95,7 +101,7 @@ class OkanbanApi(Resource):
             del args['date']
             args['qty'] = 1 # Nb d'étiquettes
             args['etiquette'] = okanban_etiquette
-            args['mesures'] = "\n".join([f"{mesure['cote']} : {mesure['value']}"  for mesure in args['mesures'].values() if mesure['result']!= 'Vrai'])
+            args['mesures'] = "\n".join([f"{mesure['cote']} : {mesure['value']}"  for mesure in args['mesures'].values() if mesure['result']== 'Faux'])
             okanban_printer.print(**args)
         except Exception as e:
             logging.error(e)
