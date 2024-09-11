@@ -8,7 +8,7 @@ et génère un suivi de production (via api sur srv-tse:50888)
 et envoie un email à qualite@olfa.fr si un contrôle n'est pas conforme.
 
 Executer tous les jours par SRV-DEBIAN toutes les 10 minutes
-Crontab : */10 7-16 * * 1-5 /usr/local/bin/python3 /home/administrateur/commun/ApplicationsOLFA/OKanbans/OTriggers/triggers.py
+Crontab : */10 7-16 * * 1-5 /opt/OKanban/trigger.sh
 '''
 
 
@@ -106,12 +106,14 @@ if kanbans_errors:
         for key, mesure in kanban.get('mesures').items():
             if mesure.get('result')=='Faux':
                 txt += f"> **{key}** : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})<br>"
-    smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
-    smtp.send('qualite@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
+    smtp.send(['frederic.thome@olfa.fr', 'qualite@olfa.fr'], "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     logging.info(f"Email sent : {txt}")
 else:
     if kanbans_ok:
-        smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(f"Tout est ok!\n{len(kanbans_ok)} kanbans ok."), type = 'html')
+        txt = f"Tout est ok!\n{len(kanbans_ok)} kanbans ok.\n"
+        for kanban in kanbans_ok:
+            txt += f"\t{kanban.get('proref')} : {kanban.get('qte')}\n"
+        smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
 
 logging.info(f'OKanban Triggers end on {socket.gethostname()}')
 

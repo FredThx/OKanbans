@@ -42,7 +42,7 @@ class Smtp:
             'path_basename' : filename.parent/filename.stem
             }
 
-    def send(self, receiver_address, subject = "", body = "", attach_file_name = None, sender_address = None, type = 'plain'):
+    def send(self, receiver_address, subject = "", body = "", attach_file_name = None, sender_address = None, msg_type = 'plain'):
         ''' Send a message
         if attach_file, subject and body can use format like "{filename} {name} {suffix} {path} {basename} {path_basename}"
         return True si ok
@@ -56,10 +56,15 @@ class Smtp:
         #Setup the MIME
         message = MIMEMultipart()
         message['From'] = sender_address
-        message['To'] = receiver_address
+        if type(receiver_address) == str:
+            message['To'] = receiver_address
+        elif type(receiver_address) == list:
+            message['To'] = ";".join(receiver_address)
+        else:
+            assert f"receiver_address must be str or list, not {type(receiver_address)}."
         message['Subject'] = subject
         #The body
-        message.attach(MIMEText(body, type))
+        message.attach(MIMEText(body, msg_type))
         # the attachment file
         if attach_file_name:
             attach_file_name = Path(attach_file_name)
@@ -101,5 +106,6 @@ class NoneSmtp():
 
 
 if __name__ == "__main__":
-    smtp = Smtp('smtp.gmail.com', 587, 'fredthxdev@gmail.com', "555dcfg8***")
-    smtp.send('fredthx@gmail.com', "Essai", "C'est juste un test","../hotfolder/888.txt")
+    #smtp = Smtp('smtp.gmail.com', 587, 'fredthxdev@gmail.com', "555dcfg8***")
+    smtp = Smtp('SRV-SQL', 25, 'courrier@olfa.fr', 'courrier@olfa.fr', "huit8\\_8", starttls=False)
+    smtp.send(['fredthx@gmail.com', 'frederic.thome@olfa.fr'], "Essai", "C'est juste un test")#,"../hotfolder/888.txt")
