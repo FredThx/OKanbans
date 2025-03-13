@@ -5,8 +5,8 @@ Documentation=man:cron(8)  # pour man.service
 
 [Service]
 TimeoutStartSec=0
-WorkingDirectory = /opt/OKanban
-ExecStart=/usr/local/bin/python3 /opt/OKanban/okanban_api.py
+WorkingDirectory = /opt/OKanbans
+ExecStart=/usr/local/bin/python3 /opt/OKanbans/okanban_api.py
 Type = simple
 RemainAfterExit = no
 User = root
