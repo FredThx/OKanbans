@@ -145,7 +145,10 @@ class BddOKanbans(object):
         else:
             id = 1
         self.set_params(self.param_last_id, id)
-        return id
+        if self.get_kanbans(id): #Si le id existe déjà....
+            return self.get_id()
+        else:
+            return id
 
     def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None, mesures = None, conforme = None, operateur = None):
         ''' Create or change a kanban
