@@ -150,7 +150,7 @@ class BddOKanbans(object):
         else:
             return id
 
-    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None, mesures = None, conforme = None, operateur = None):
+    def set_kanban(self, id = None, proref = None, qte = None, date_creation = None, type = None, mesures = None, conforme = None, operateur = None, remarques = None):
         ''' Create or change a kanban
         mesures : mesures du perçage
         conforme : perçage conforme
@@ -181,6 +181,8 @@ class BddOKanbans(object):
             kanban['mesures'] = mesures
             kanban['conforme'] = conforme
             kanban['operateur'] = operateur
+            if remarques:
+                kanban['remarques'] = remarques
             self.kanbans.insert_one(kanban)
         else:
             kanban = self.get_list(self.kanbans.find({'id' : id}))

@@ -90,7 +90,7 @@ class OkanbanApi(Resource):
             args['mesures'] = {cote : {k : self.t_validation.get(v,'') if (v is None or type(v)==bool) else v for k, v in mesure.items()} for cote, mesure in args.get('mesures',{}).items()}
         if not args.get('only_print'):
             #Creation d'un kanban
-            id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'))
+            id = okanban_bdd.set_kanban(proref=args['proref'], qte=args.get('qte'), type = "creation", mesures=args.get('mesures'), conforme = args.get('conforme'), operateur=args.get('operateur'), remarques=args.get('remarques'))
         else:
             id = ""
         try:

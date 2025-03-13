@@ -106,6 +106,8 @@ if kanbans_errors:
         for key, mesure in kanban.get('mesures').items():
             if mesure.get('result')=='Faux':
                 txt += f"> **{key}** : {mesure.get('value')} (doit être compris entre {mesure.get('mini')} et {mesure.get('maxi')})<br>"
+        if kanban.get('remarques'):
+            txt += f"\n> Notes : {kanban.get('remarques')}\n"
     smtp.send(['frederic.thome@olfa.fr', 'qualite@olfa.fr'], "Contrôle des perçages", markdown.markdown(txt), type = 'html')
     logging.info(f"Email sent : {txt}")
 else:
