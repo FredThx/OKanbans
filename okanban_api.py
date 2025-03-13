@@ -37,6 +37,10 @@ def verify_password(username, password):
         return check_password_hash(users.get(username), password)
     return False
 
+class OkanbanApihello(Resource):
+    def get(self):
+        return "OKanban API is running"
+
 okanban_api_parser = reqparse.RequestParser()
 okanban_api_parser.add_argument('proref', type=str, required = True)
 okanban_api_parser.add_argument('qte', type=int)
@@ -113,6 +117,7 @@ class OkanbanApi(Resource):
             return "OK", 200 #TODO : renvoyer Id (et le gérer dans access!!)
 
 api.add_resource(OkanbanApi, "/okanban/qte/<proref>", "/okanban")
+api.add_resource(OkanbanApihello, "/")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=50890, debug=False)
