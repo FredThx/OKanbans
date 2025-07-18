@@ -9,27 +9,32 @@ from flask import Flask, request
 from flask_restful import abort, Api, Resource, reqparse
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime, json, re
+import datetime
 
 from OKanban.bdd import BddOKanbans
 from OKanban.nicelabel import HttpNiceLabel
+from OKanban.environnement import *
 
 from FUTIL.my_logging import *
-my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
+
+console_level = globals()[OKANBAN_CONSOLE_LEVEL]
+logfile_level = globals()[OKANBAN_LOGFILE_LEVEL]
+my_logging(console_level = console_level, logfile_level = logfile_level, details = True)
+
 logging.info('OKanban API start')
 
 app = Flask(__name__)
 api = Api(app)
 
-okanban_bdd = BddOKanbans('192.168.0.11')
-okanban_printer = HttpNiceLabel('http://192.168.0.6:56425')
+okanban_bdd = BddOKanbans(OKANBAN_MONGODB_HOST, OKANBAN_MONGODB_PORT)
+okanban_printer = HttpNiceLabel(OKANBAN_NICELABEL_URL)
 okanban_printer_name = None
 #okanban_printer_name = "IMP_TEST"
-okanban_etiquette = "ET_PER_API"
+okanban_etiquette = OKANBAN_ETIQUETTE
 
 auth = HTTPBasicAuth()
 users = {
-    "olfa": generate_password_hash("Trone08")
+    OKANBAN_API_USERNAME: generate_password_hash(OKANBAN_API_PASSWORD)
 }
 @auth.verify_password
 def verify_password(username, password):
@@ -103,6 +108,13 @@ class OkanbanApi(Resource):
             args['printer'] = okanban_printer_name or okanban_bdd.get_param('printer')
             args['date_creation'] = args['date']
             del args['date']
+            try:
+                dure_degazage = okanban_bdd.get_references(args['proref'])[0]['duree_degazage']
+            except (KeyError, IndexError):
+                dure_degazage = None
+            if dure_degazage is not None:
+                args['duree_degazage'] = dure_degazage
+            args['duree_degazage'] = okanban_bdd.get_references
             args['qty'] = 1 # Nb d'étiquettes
             args['etiquette'] = okanban_etiquette
             args['mesures'] = "\n".join([f"{mesure['cote']} : {mesure['value']}"  for mesure in args['mesures'].values() if mesure['result']== 'Faux'])
@@ -120,4 +132,4 @@ api.add_resource(OkanbanApi, "/okanban/qte/<proref>", "/okanban")
 api.add_resource(OkanbanApihello, "/")
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=50890, debug=False)
+    app.run(host='0.0.0.0', port=OKANBAN_PORT, debug=False)

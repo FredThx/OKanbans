@@ -1,3 +1,4 @@
 * gérer la connexion/déconnexion à la base
     * mettre en thread
 * revoir paramètres (bug en création de paramètre)
+* Ajouter duree_degazage dans l'interface paramètres
