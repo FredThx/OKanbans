@@ -30,7 +30,7 @@ class OKanbanApp(QMainWindow):
         '''
         super().__init__(parent)
         self.fullscreen = fullscreen
-        self.setWindowTitle(f"{title} - {__version__}")
+        self.setWindowTitle(f"{title} - {__version__} - BDD : {host}:{port}")
         #self.setWindowFlag(Qt.FramelessWindowHint)
         self.setWindowFlags(
             Qt.WindowCloseButtonHint |
