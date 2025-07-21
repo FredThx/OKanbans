@@ -10,7 +10,7 @@ sudo docker run --env=GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
                 --env=OKANBAN_LOGFILE_LEVEL=INFO \
                 --env=OKANBAN_MONGODB_HOST=192.168.0.20 \
                 --env=OKANBAN_MONGODB_PORT=27017 \
-                --env=OKANBAN_NICELABEL_URL=http://192.168.0.16:56426 \
+                --env=OKANBAN_NICELABEL_URL=http://192.168.0.16:56425 \
                 --env=OKANBAN_API_USERNAME=olfa \
                 --env=OKANBAN_API_PASSWORD=Trone08 \
                 --env=OKANBAN_ETIQUETTE=ET_PER_API \
