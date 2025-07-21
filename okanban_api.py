@@ -14,6 +14,7 @@ import datetime
 from OKanban.bdd import BddOKanbans
 from OKanban.nicelabel import HttpNiceLabel
 from OKanban.environnement import *
+from OKanban.version import __version__
 
 from FUTIL.my_logging import *
 
@@ -44,7 +45,7 @@ def verify_password(username, password):
 
 class OkanbanApihello(Resource):
     def get(self):
-        return "OKanban API is running"
+        return f"OKanban API is running. Version: {__version__}. OKANBAN_NICELABEL_URL: {OKANBAN_NICELABEL_URL}"
 
 okanban_api_parser = reqparse.RequestParser()
 okanban_api_parser.add_argument('proref', type=str, required = True)
