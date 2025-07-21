@@ -22,7 +22,7 @@ parser.add_argument('-e', '--etiquette', action = 'store', help = "nom du format
 
 args = parser.parse_args()
 
-args.printer = HttpNiceLabel('http://192.168.0.6:56425')
+args.printer = HttpNiceLabel('http://192.168.0.16:56425')
 
 app = QApplication([])
 

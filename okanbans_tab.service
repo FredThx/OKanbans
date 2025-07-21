@@ -4,7 +4,7 @@ After=network.target graphical.target
 Wants=graphical.target
 
 [Service]
-ExecStart= /bin/bash -c "export DISPLAY=:0; export XAUTHORITY=/home/pi/.Xauthority; sudo /usr/bin/python /opt/OKanbans/okanbans.py --mode tab --fullscreen"
+ExecStart= /bin/bash -c "export DISPLAY=:0; export XAUTHORITY=/home/pi/.Xauthority; sudo /usr/bin/python /opt/OKanbans/okanbans.py --host SRV-DASH --mode tab --fullscreen"
 KillMode=process
 TimeoutSec=infinity
 WorkingDirectory=/opt/OKanbans/
