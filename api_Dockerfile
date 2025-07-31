@@ -7,11 +7,10 @@ RUN apt-get update && apt-get -y install cron
 COPY cron_trigger /etc/cron.d/cron_trigger
 RUN chmod 0644 /etc/cron.d/cron_trigger
 RUN crontab /etc/cron.d/cron_trigger
-RUN cron
 COPY . ./
 EXPOSE 50890
 ENV OKANBAN_PORT=50890
 ENV LANG=fr_FR.UTF-8
 ENV LANGUAGE=fr_FR.UTF-8
 ENV LC_ALL=fr_FR.UTF-8
-CMD gunicorn -b 0.0.0.0:50890 okanban_api:app
+CMD cron && gunicorn -b 0.0.0.0:50890 okanban_api:app
