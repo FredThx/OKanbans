@@ -121,7 +121,7 @@ else:
         txt = f"Tout est ok!\n{len(kanbans_ok)} kanbans ok.\n"
         for kanban in kanbans_ok:
             txt += f"\t{kanban.get('proref')} : {kanban.get('qte')}\n"
-        smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), type = 'html')
+        smtp.send('frederic.thome@olfa.fr', "Contrôle des perçages", markdown.markdown(txt), msg_type = 'html')
 
 logging.info(f'OKanban Triggers end on {socket.gethostname()}')
 
