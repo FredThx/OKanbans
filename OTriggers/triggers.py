@@ -11,6 +11,8 @@ Executer tous les jours par SRV-DEBIAN toutes les 10 minutes
 Crontab : */10 7-16 * * 1-5 /opt/OKanban/trigger.sh
 '''
 
+import sys, os, datetime, socket
+sys.path.append(os.path.join(sys.path[0],'..'))
 
 import datetime, socket
 from OKanban.bdd import BddOKanbans
