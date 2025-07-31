@@ -115,7 +115,6 @@ class OkanbanApi(Resource):
                 dure_degazage = None
             if dure_degazage is not None:
                 args['duree_degazage'] = dure_degazage
-            args['duree_degazage'] = okanban_bdd.get_references
             args['qty'] = 1 # Nb d'étiquettes
             args['etiquette'] = okanban_etiquette
             args['mesures'] = "\n".join([f"{mesure['cote']} : {mesure['value']}"  for mesure in args['mesures'].values() if mesure['result']== 'Faux'])
