@@ -8,6 +8,7 @@ sudo docker run --env=GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
                 --env=PYTHON_SHA256=ae665bc678abd9ab6a6e1573d2481625a53719bc517e9a634ed2b9fefae3817f \
                 --env=OKANBAN_CONSOLE_LEVEL=INFO \
                 --env=OKANBAN_LOGFILE_LEVEL=INFO \
+                --env=OKANBAN_LOG_FILE=/var/docker_logs/okanban_api.log \
                 --env=OKANBAN_MONGODB_HOST=192.168.0.20 \
                 --env=OKANBAN_MONGODB_PORT=27017 \
                 --env=OKANBAN_NICELABEL_URL=http://192.168.0.16:56425 \
@@ -19,6 +20,7 @@ sudo docker run --env=GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
                 --restart=no \
                 --runtime=runc \
                 --name=api_okanbans \
+                -v /var/docker_logs:/var/docker_logs \
                 -d api_okanbans:latest
 # Clean up unused images
 sudo docker image prune -f

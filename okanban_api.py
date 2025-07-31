@@ -18,9 +18,10 @@ from OKanban.version import __version__
 
 from FUTIL.my_logging import *
 
+#Logging
 console_level = globals()[OKANBAN_CONSOLE_LEVEL]
 logfile_level = globals()[OKANBAN_LOGFILE_LEVEL]
-my_logging(console_level = console_level, logfile_level = logfile_level, details = True)
+my_logging(console_level = console_level, logfile_level = logfile_level, details = True, name_logfile=OKANBAN_LOG_FILE)
 
 logging.info('OKanban API start')
 
