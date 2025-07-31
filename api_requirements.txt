@@ -6,4 +6,5 @@ werkzeug
 FUTIL
 pymongo == 3.11.3
 gunicorn
+markdown
 
