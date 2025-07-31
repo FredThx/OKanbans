@@ -16,3 +16,4 @@ OKANBAN_API_PASSWORD = os.getenv('OKANBAN_API_PASSWORD', 'Trone08')
 OKANBAN_ETIQUETTE = os.getenv('OKANBAN_ETIQUETTE', 'ET_PER_API')
 
 OKANBAN_LOG_FILE = os.getenv('OKANBAN_LOG_FILE', os.path.splitext(sys.argv[0])[0] + '.log')
+OKANBAN_TRIGGER_LOG_FILE = os.getenv('OKANBAN_TRIGGER_LOG_FILE', os.path.splitext(sys.argv[0])[0] + '.log')

@@ -3,6 +3,10 @@ COPY api_requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 RUN apt-get update
 RUN apt-get install -y locales locales-all
+RUN apt-get update && apt-get -y install cron
+COPY cron_trigger /etc/cron.d/cron_trigger
+RUN chmod 0644 /etc/cron.d/cron_trigger
+RUN crontab /etc/cron.d/cron_trigger
 COPY . ./
 EXPOSE 50890
 ENV OKANBAN_PORT=50890

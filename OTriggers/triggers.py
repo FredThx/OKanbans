@@ -12,15 +12,19 @@ Crontab : */10 7-16 * * 1-5 /opt/OKanban/trigger.sh
 '''
 
 
-import sys, os, datetime, socket
-sys.path.append(os.path.join(sys.path[0],'..','OKanban'))
-from bdd import BddOKanbans
-from silvercs import HttpSilverCS
-from smtp import Smtp
+import datetime, socket
+from OKanban.bdd import BddOKanbans
+from OTriggers.silvercs import HttpSilverCS
+from OTriggers.smtp import Smtp
 from FUTIL.my_logging import *
 import markdown
+from OKanban.environnement import OKANBAN_CONSOLE_LEVEL, OKANBAN_LOGFILE_LEVEL, OKANBAN_TRIGGER_LOG_FILE
 
-my_logging(console_level = DEBUG, logfile_level = INFO, details = True)
+#Logging
+console_level = globals()[OKANBAN_CONSOLE_LEVEL]
+logfile_level = globals()[OKANBAN_LOGFILE_LEVEL]
+my_logging(console_level = console_level, logfile_level = logfile_level, details = True, name_logfile=OKANBAN_TRIGGER_LOG_FILE)
+
 logging.info(f'OKanban Triggers start on {socket.gethostname()}')
 
 bdd = BddOKanbans('192.168.0.11')

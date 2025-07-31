@@ -9,6 +9,7 @@ sudo docker run --env=GPG_KEY=A035C8C19219BA821ECEA86B64E628F8D684696D \
                 --env=OKANBAN_CONSOLE_LEVEL=INFO \
                 --env=OKANBAN_LOGFILE_LEVEL=INFO \
                 --env=OKANBAN_LOG_FILE=/var/docker_logs/okanban_api.log \
+                --env=OKANBAN_TRIGGER_LOG_FILE=/var/docker_logs/okanban_trigger.log \
                 --env=OKANBAN_MONGODB_HOST=192.168.0.20 \
                 --env=OKANBAN_MONGODB_PORT=27017 \
                 --env=OKANBAN_NICELABEL_URL=http://192.168.0.16:56425 \
